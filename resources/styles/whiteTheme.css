@@ -1,11 +1,10 @@
 .root{
-    default-color: #5C527F;
-    selected-color: #6E85B2;
-    background-color: #261C2C;
-    elevated-background-color: #3E2C41;
-    text-color: white;
+    default-color: #9ED5C5;
+    selected-color: #8EC3B0;
+    background-color: #DEF5E5;
+    elevated-background-color: #BCEAD5;
+    text-color: black;
 }
-
 .tab-pane .tab-header-area .tab-header-background {
     -fx-opacity: 0;
 }
