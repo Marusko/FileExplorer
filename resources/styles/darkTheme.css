@@ -181,3 +181,14 @@
     -fx-pref-height: 70px;
     -fx-background-color: transparent;
 }
+.progress-bar{
+    -fx-pref-width: 140px;
+    -fx-pref-height: 15px;
+    -fx-background-color: transparent;
+}
+.progress-bar .track {
+    -fx-background-color: papayawhip;
+}
+.progress-bar .bar{
+    -fx-background-color: selected-color;
+}
