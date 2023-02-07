@@ -5,7 +5,6 @@
     elevated-background-color: #3E2C41;
     text-color: white;
 }
-
 .tab-pane .tab-header-area .tab-header-background {
     -fx-opacity: 0;
 }
@@ -117,6 +116,8 @@
 .hbox-disk {
     -fx-background-color: elevated-background-color;
     -fx-background-radius: 10px;
+    -fx-pref-width: 250px;
+    -fx-pref-height: 50px;
 }
 .hbox-disk:hover {
     button-color: default-color;
@@ -172,5 +173,11 @@
     -fx-background-color: transparent;
 }
 .scroll-bar .decrement-button{
+    -fx-background-color: transparent;
+}
+
+.pinned-control-right {
+    -fx-pref-width: 250px;
+    -fx-pref-height: 70px;
     -fx-background-color: transparent;
 }

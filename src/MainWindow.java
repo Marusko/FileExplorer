@@ -5,10 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -258,26 +255,38 @@ public class MainWindow extends Application {
         diskBox.getChildren().addAll(diskName, pb);
         diskBox.setSpacing(10);
         diskBox.setAlignment(Pos.CENTER_LEFT);
-        HBox disk = new HBox(icon, diskBox);
-        disk.setSpacing(10);
-        disk.getStyleClass().add("hbox-disk");
-        disk.setPadding(new Insets(10));
-        return disk;
+        HBox diskUI = new HBox(icon, diskBox);
+        diskUI.setSpacing(10);
+        diskUI.getStyleClass().add("hbox-disk");
+        diskUI.setPadding(new Insets(10));
+        Button control = new Button();
+        control.getStyleClass().add("pinned-control-right");
+        control.setOnMouseEntered(e -> diskUI.setStyle("-fx-background-color: default-color"));
+        control.setOnMouseExited(e -> diskUI.setStyle("-fx-background-color: elevated-background-color"));
+        StackPane diskSP = new StackPane(diskUI, control);
+
+        return new HBox(diskSP);
     }
     private HBox pinnedUI(String name) {
         ImageView icon = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/folder.png")).toExternalForm()));
         icon.setFitHeight(50);
         icon.setFitWidth(50);
         Label fileName = new Label(name);
-        fileName.setContextMenu(this.setRightClickMenu(1));
         fileName.setStyle("-fx-font-size: 15px");
         VBox nameBox = new VBox(fileName);
         nameBox.setAlignment(Pos.CENTER);
-        HBox file = new HBox(icon, nameBox);
-        file.setSpacing(30);
-        file.getStyleClass().add("hbox-disk");
-        file.setPadding(new Insets(10));
-        return file;
+        HBox fileUI = new HBox(icon, nameBox);
+        fileUI.setSpacing(30);
+        fileUI.getStyleClass().add("hbox-disk");
+        fileUI.setPadding(new Insets(10));
+        Button control = new Button();
+        control.getStyleClass().add("pinned-control-right");
+        control.setContextMenu(this.setRightClickMenu(1));
+        control.setOnMouseEntered(e -> fileUI.setStyle("-fx-background-color: default-color"));
+        control.setOnMouseExited(e -> fileUI.setStyle("-fx-background-color: elevated-background-color"));
+        StackPane fileSP = new StackPane(fileUI, control);
+
+        return new HBox(fileSP);
     }
     private HBox fileUI(boolean list, File file, String name) {
         HBox fileBox = new HBox();
@@ -288,29 +297,37 @@ public class MainWindow extends Application {
             Label date = new Label("Date");
             ImageView icon = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/folder_small.png")).toExternalForm()));
             Label fileName = new Label(name);
-            fileName.setContextMenu(this.setRightClickMenu(0));
             nameBox.getChildren().addAll(icon, fileName);
             nameBox.setSpacing(20);
             nameBox.setAlignment(Pos.CENTER_LEFT);
             nameBox.setPrefWidth(200);
 
-            listBox.setPadding(new Insets(10));
-            listBox.setAlignment(Pos.CENTER_LEFT);
-            listBox.setPrefWidth(900);
-            listBox.setPrefHeight(35);
+            listBox.setStyle("-fx-padding: 10px; -fx-alignment: center-left;-fx-pref-width: 900px; -fx-pref-height: 35; -fx-spacing: 500");
             listBox.getChildren().addAll(nameBox, date);
-            listBox.setSpacing(500);
 
-            fileBox.getChildren().add(listBox);
+            Button control = new Button();
+            control.setStyle("-fx-pref-height: 40px; -fx-pref-width: 900px; -fx-background-color: transparent");
+            control.setContextMenu(this.setRightClickMenu(0));
+            control.setOnMouseEntered(e -> fileBox.setStyle("-fx-background-color: default-color"));
+            control.setOnMouseExited(e -> fileBox.setStyle("-fx-background-color: elevated-background-color"));
+            StackPane listSP = new StackPane(listBox, control);
+
+            fileBox.getChildren().add(listSP);
         } else {
             VBox objectBox = new VBox();
             ImageView icon = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/folder.png")).toExternalForm()));
             Label fileName = new Label(name);
             objectBox.getChildren().addAll(icon, fileName);
-            objectBox.setPadding(new Insets(20));
-            objectBox.setSpacing(20);
-            objectBox.setAlignment(Pos.CENTER);
-            fileBox.getChildren().add(objectBox);
+            objectBox.setStyle("-fx-padding: 20px; -fx-spacing: 20px; -fx-alignment: center; -fx-pref-width: 100px; -fx-pref-height: 200px");
+
+            Button control = new Button();
+            control.setStyle("-fx-pref-height: 210px; -fx-pref-width: 170px; -fx-background-color: transparent");
+            control.setContextMenu(this.setRightClickMenu(0));
+            control.setOnMouseEntered(e -> fileBox.setStyle("-fx-background-color: default-color"));
+            control.setOnMouseExited(e -> fileBox.setStyle("-fx-background-color: elevated-background-color"));
+            StackPane objectSP = new StackPane(objectBox, control);
+
+            fileBox.getChildren().add(objectSP);
         }
         return fileBox;
     }
