@@ -51,12 +51,39 @@
     -fx-font-size: 15px;
     -fx-font-weight: bold;
 }
+.side-button:hover {
+    button-color: selected-color;
+    -fx-background-color: button-color;
+}
 .top-bar-button {
     button-color: default-color;
     -fx-background-color: button-color;
     -fx-pref-height: 30px;
     -fx-pref-width: 30px;
     -fx-text-fill: text-color;
+}
+.top-bar-button:hover {
+    button-color: selected-color;
+    -fx-background-color: button-color;
+}
+.context-menu {
+    -fx-background-color: background-color;
+    -fx-background-radius: 4px;
+}
+.menu-button > .arrow-button {
+    -fx-padding: 0;
+}
+.menu-button > .arrow-button > .arrow {
+    -fx-padding: 0;
+}
+.menu-item {
+    -fx-pref-width: 100px;
+    -fx-background-radius: 3px;
+    -fx-background-color: background-color;
+    -fx-padding: 10px;
+}
+.menu-item:hover {
+    -fx-background-color: elevated-background-color;
 }
 .top-bar-label {
     -fx-text-fill: text-color;
@@ -75,6 +102,10 @@
     -fx-pref-width: 15px;
     -fx-text-fill: text-color;
 }
+.bottom-bar-button:hover {
+    button-color: selected-color;
+    -fx-background-color: button-color;
+}
 .label {
     -fx-text-fill: text-color;
     -fx-font-weight: bold;
@@ -86,12 +117,20 @@
     -fx-background-color: elevated-background-color;
     -fx-background-radius: 10px;
 }
+.hbox-disk:hover {
+    button-color: default-color;
+    -fx-background-color: button-color;
+}
 .vbox {
     -fx-background-color: background-color;
 }
 .file-box {
     -fx-background-color: elevated-background-color;
     -fx-background-radius: 10px;
+}
+.file-box:hover {
+    button-color: default-color;
+    -fx-background-color: button-color;
 }
 .scroll-pane {
     -fx-background-color: background-color;

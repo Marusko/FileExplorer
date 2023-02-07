@@ -49,33 +49,21 @@ public class MainWindow extends Application {
         side.getStyleClass().add("vbox");
         Button desktop = new Button("Desktop");
         desktop.getStyleClass().add("side-button");
-        desktop.setOnMouseEntered(e -> desktop.setStyle("-fx-background-color: selected-color"));
-        desktop.setOnMouseExited(e -> desktop.setStyle("-fx-background-color: default-color"));
 
         Button download = new Button("Download");
         download.getStyleClass().add("side-button");
-        download.setOnMouseEntered(e -> download.setStyle("-fx-background-color: selected-color"));
-        download.setOnMouseExited(e -> download.setStyle("-fx-background-color: default-color"));
 
         Button docs = new Button("Docs");
         docs.getStyleClass().add("side-button");
-        docs.setOnMouseEntered(e -> docs.setStyle("-fx-background-color: selected-color"));
-        docs.setOnMouseExited(e -> docs.setStyle("-fx-background-color: default-color"));
 
         Button pics = new Button("Pictures");
         pics.getStyleClass().add("side-button");
-        pics.setOnMouseEntered(e -> pics.setStyle("-fx-background-color: selected-color"));
-        pics.setOnMouseExited(e -> pics.setStyle("-fx-background-color: default-color"));
 
         Button music = new Button("Music");
         music.getStyleClass().add("side-button");
-        music.setOnMouseEntered(e -> music.setStyle("-fx-background-color: selected-color"));
-        music.setOnMouseExited(e -> music.setStyle("-fx-background-color: default-color"));
 
         Button videos = new Button("Videos");
         videos.getStyleClass().add("side-button");
-        videos.setOnMouseEntered(e -> videos.setStyle("-fx-background-color: selected-color"));
-        videos.setOnMouseExited(e -> videos.setStyle("-fx-background-color: default-color"));
 
         side.getChildren().addAll(desktop, download, docs, pics, music, videos);
         side.setMaxWidth(200);
@@ -132,6 +120,7 @@ public class MainWindow extends Application {
         BorderPane folderBP = new BorderPane();
         folderBP.getStyleClass().add("home-border-pane");
         ScrollPane folderSP = new ScrollPane();
+        folderSP.setContextMenu(this.setRightClickMenu(2));
         folderSP.setOnMouseEntered(e ->folderSP.lookup(".scroll-bar").setStyle("bar-width: bar-fat; bar-height: bar-fat"));
         folderSP.setOnMouseExited(e -> folderSP.lookup(".scroll-bar").setStyle("bar-width: bar-skinny; bar-height: bar-skinny"));
         FlowPane fileFP = new FlowPane();
@@ -157,8 +146,6 @@ public class MainWindow extends Application {
 
         Button listView = new Button();
         listView.getStyleClass().add("bottom-bar-button");
-        listView.setOnMouseEntered(e -> listView.setStyle("-fx-background-color: selected-color"));
-        listView.setOnMouseExited(e -> listView.setStyle("-fx-background-color: default-color"));
         ImageView iconL = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/form.png")).toExternalForm()));
         iconL.setFitWidth(20);
         iconL.setFitHeight(20);
@@ -166,8 +153,6 @@ public class MainWindow extends Application {
 
         Button objectView = new Button();
         objectView.getStyleClass().add("bottom-bar-button");
-        objectView.setOnMouseEntered(e -> objectView.setStyle("-fx-background-color: selected-color"));
-        objectView.setOnMouseExited(e -> objectView.setStyle("-fx-background-color: default-color"));
         ImageView iconO = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/blog.png")).toExternalForm()));
         iconO.setFitWidth(20);
         iconO.setFitHeight(20);
@@ -185,8 +170,6 @@ public class MainWindow extends Application {
     private HBox setTopBar() {
         Button back = new Button();
         back.getStyleClass().add("top-bar-button");
-        back.setOnMouseEntered(e -> back.setStyle("-fx-background-color: selected-color"));
-        back.setOnMouseExited(e -> back.setStyle("-fx-background-color: default-color"));
         ImageView iconB = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/back.png")).toExternalForm()));
         iconB.setFitWidth(20);
         iconB.setFitHeight(20);
@@ -194,8 +177,6 @@ public class MainWindow extends Application {
 
         Button forth = new Button();
         forth.getStyleClass().add("top-bar-button");
-        forth.setOnMouseEntered(e -> forth.setStyle("-fx-background-color: selected-color"));
-        forth.setOnMouseExited(e -> forth.setStyle("-fx-background-color: default-color"));
         ImageView iconF = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/next.png")).toExternalForm()));
         iconF.setFitWidth(20);
         iconF.setFitHeight(20);
@@ -203,21 +184,26 @@ public class MainWindow extends Application {
 
         Button refresh = new Button();
         refresh.getStyleClass().add("top-bar-button");
-        refresh.setOnMouseEntered(e -> refresh.setStyle("-fx-background-color: selected-color"));
-        refresh.setOnMouseExited(e -> refresh.setStyle("-fx-background-color: default-color"));
         ImageView iconR = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/refresh.png")).toExternalForm()));
         iconR.setFitWidth(20);
         iconR.setFitHeight(20);
         refresh.setGraphic(iconR);
 
-        Button more = new Button();
+        MenuButton more = new MenuButton();
         more.getStyleClass().add("top-bar-button");
-        more.setOnMouseEntered(e -> more.setStyle("-fx-background-color: selected-color"));
-        more.setOnMouseExited(e -> more.setStyle("-fx-background-color: default-color"));
         ImageView iconM = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/menu.png")).toExternalForm()));
         iconM.setFitWidth(20);
         iconM.setFitHeight(20);
         more.setGraphic(iconM);
+
+        MenuItem copy = new MenuItem("Copy");
+        MenuItem cut = new MenuItem("Cut");
+        MenuItem paste = new MenuItem("Paste");
+        MenuItem delete = new MenuItem("Delete");
+        MenuItem settings = new MenuItem("Settings");
+        MenuItem rename = new MenuItem("Rename");
+        MenuItem newMenuItem = new MenuItem("New folder");
+        more.getItems().addAll(copy, cut, paste, rename, newMenuItem, delete, settings);
 
         Label address = new Label("C:/TEST/TSET");
         address.getStyleClass().add("top-bar-label");
@@ -231,6 +217,34 @@ public class MainWindow extends Application {
         topBar.setPadding(new Insets(2));
         topBar.getStyleClass().add("hbox-bar");
         return topBar;
+    }
+
+    private ContextMenu setRightClickMenu(int onFile) {
+        ContextMenu menu = new ContextMenu();
+        switch (onFile) {
+            case 0 -> {
+                MenuItem properties = new MenuItem("Properties");
+                MenuItem pin = new MenuItem("Pin this");
+                MenuItem pathItem = new MenuItem("Copy path");
+                MenuItem cut = new MenuItem("Cut");
+                MenuItem copy = new MenuItem("Copy");
+                MenuItem delete = new MenuItem("Delete");
+                menu.getItems().addAll(copy, cut, delete, pin, pathItem, properties);
+            }
+            case 1 -> {
+                MenuItem properties1 = new MenuItem("Properties");
+                MenuItem unpin = new MenuItem("Unpin this");
+                MenuItem pathItem1 = new MenuItem("Copy path");
+                MenuItem copy1 = new MenuItem("Copy");
+                MenuItem delete1 = new MenuItem("Delete");
+                menu.getItems().addAll(copy1, delete1, unpin, pathItem1, properties1);
+            }
+            case 2 -> {
+                MenuItem paste = new MenuItem("Paste");
+                menu.getItems().add(paste);
+            }
+        }
+        return menu;
     }
 
     private HBox diskUI(String name, double capacity, double used) {
@@ -248,8 +262,6 @@ public class MainWindow extends Application {
         disk.setSpacing(10);
         disk.getStyleClass().add("hbox-disk");
         disk.setPadding(new Insets(10));
-        disk.setOnMouseEntered(e -> disk.setStyle("-fx-background-color: default-color"));
-        disk.setOnMouseExited(e -> disk.setStyle("-fx-background-color: elevated-background-color"));
         return disk;
     }
     private HBox pinnedUI(String name) {
@@ -257,6 +269,7 @@ public class MainWindow extends Application {
         icon.setFitHeight(50);
         icon.setFitWidth(50);
         Label fileName = new Label(name);
+        fileName.setContextMenu(this.setRightClickMenu(1));
         fileName.setStyle("-fx-font-size: 15px");
         VBox nameBox = new VBox(fileName);
         nameBox.setAlignment(Pos.CENTER);
@@ -264,8 +277,6 @@ public class MainWindow extends Application {
         file.setSpacing(30);
         file.getStyleClass().add("hbox-disk");
         file.setPadding(new Insets(10));
-        file.setOnMouseEntered(e -> file.setStyle("-fx-background-color: default-color"));
-        file.setOnMouseExited(e -> file.setStyle("-fx-background-color: elevated-background-color"));
         return file;
     }
     private HBox fileUI(boolean list, File file, String name) {
@@ -277,6 +288,7 @@ public class MainWindow extends Application {
             Label date = new Label("Date");
             ImageView icon = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/folder_small.png")).toExternalForm()));
             Label fileName = new Label(name);
+            fileName.setContextMenu(this.setRightClickMenu(0));
             nameBox.getChildren().addAll(icon, fileName);
             nameBox.setSpacing(20);
             nameBox.setAlignment(Pos.CENTER_LEFT);
@@ -300,8 +312,6 @@ public class MainWindow extends Application {
             objectBox.setAlignment(Pos.CENTER);
             fileBox.getChildren().add(objectBox);
         }
-        fileBox.setOnMouseEntered(e -> fileBox.setStyle("-fx-background-color: default-color"));
-        fileBox.setOnMouseExited(e -> fileBox.setStyle("-fx-background-color: elevated-background-color"));
         return fileBox;
     }
 
