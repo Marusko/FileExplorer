@@ -20,6 +20,7 @@ public class MainWindow extends Application {
     private final Hyperlink moreLink = new Hyperlink("Github");
 
     private Stage mainStage;
+    private Scene mainScene;
     private final TabPane tabPane = new TabPane();
     private BorderPane diskBP;
     private BorderPane pinnedBP;
@@ -34,7 +35,7 @@ public class MainWindow extends Application {
         BorderPane bp = new BorderPane();
         bp.setLeft(this.sidePage());
 
-        Scene mainScene = new Scene(bp, 1200, 700);
+        mainScene = new Scene(bp, 1200, 700);
         mainScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles/darkTheme.css")).toExternalForm());
         this.mainStage.setScene(mainScene);
         this.mainStage.setTitle("File explorer");
@@ -55,6 +56,19 @@ public class MainWindow extends Application {
         this.mainStage.show();
     }
 
+    private void changeTheme(String theme) {
+        switch (theme) {
+            case "Dark":mainScene.getStylesheets().clear();
+                        mainScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles/darkTheme.css")).toExternalForm());
+                        break;
+
+            case "Light":mainScene.getStylesheets().clear();
+                        mainScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles/lightTheme.css")).toExternalForm());
+                        break;
+        }
+    }
+
+    //UI--------------------------------------
     private VBox sidePage() {
         VBox side = new VBox();
         side.getStyleClass().add("vbox");
@@ -159,6 +173,7 @@ public class MainWindow extends Application {
         themeChooser.getSelectionModel().select(0);
         themeChooser.setOnMouseEntered(e -> themeChooser.setStyle("combo-color: default-color"));
         themeChooser.setOnMouseExited(e -> themeChooser.setStyle("combo-color: elevated-background-color"));
+        themeChooser.valueProperty().addListener(e -> this.changeTheme(themeChooser.getValue()));
         VBox themeBox = new VBox(themeLabel, themeChooser);
         themeBox.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
 

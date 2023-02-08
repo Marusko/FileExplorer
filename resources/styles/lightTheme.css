@@ -187,7 +187,7 @@
     -fx-background-color: transparent;
 }
 .progress-bar .track {
-    -fx-background-color: papayawhip;
+    -fx-background-color: greenyellow;
 }
 .progress-bar .bar{
     -fx-background-color: selected-color;
@@ -205,16 +205,16 @@
 }
 .combo-box .cell:selected{
     -fx-background-color: elevated-background-color;
-    -fx-text-fill: white;
+    -fx-text-fill: black;
     -fx-text-background-color: transparent;
 }
 .combo-box .cell:hover{
     -fx-background-color: default-color;
-    -fx-text-fill: white;
+    -fx-text-fill: black;
     -fx-text-background-color: transparent;
 }
 .radio-button {
-    -fx-text-fill: white;
+    -fx-text-fill: black;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
 }
