@@ -118,7 +118,7 @@ public class MainWindow extends Application {
             }
         });
 
-        tabPane.getTabs().addAll(this.homeTab(), this.folderTab(), this.settingsTab(), addTab);
+        tabPane.getTabs().addAll(this.homeTab(), this.folderTab(), addTab);
     }
 
     private Tab homeTab() {
@@ -312,6 +312,10 @@ public class MainWindow extends Application {
         MenuItem paste = new MenuItem("Paste");
         MenuItem delete = new MenuItem("Delete");
         MenuItem settings = new MenuItem("Settings");
+        settings.setOnAction(e -> {
+            tabPane.getTabs().add(tabPane.getTabs().size() - 1, this.settingsTab());
+            tabPane.getSelectionModel().select(tabPane.getTabs().size() - 2);
+        });
         MenuItem rename = new MenuItem("Rename");
         MenuItem newMenuItem = new MenuItem("New folder");
         MenuItem order = new MenuItem("Order");
