@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -8,7 +9,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
 
 public class MainWindow extends Application {
@@ -20,11 +27,8 @@ public class MainWindow extends Application {
     private final Hyperlink moreLink = new Hyperlink("Github");
 
     private MainLogic ml;
-
-    private Stage mainStage;
     private Scene mainScene;
     private final TabPane tabPane = new TabPane();
-    private BorderPane diskBP;
     private BorderPane pinnedBP;
 
     public static void main(String[] args) {
@@ -35,15 +39,14 @@ public class MainWindow extends Application {
     public void start(Stage stage){
         this.ml = new MainLogic();
 
-        this.mainStage = stage;
         BorderPane bp = new BorderPane();
         bp.setLeft(this.sidePage());
 
         mainScene = new Scene(bp, 1200, 700);
         mainScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles/darkTheme.css")).toExternalForm());
-        this.mainStage.setScene(mainScene);
-        this.mainStage.setTitle("File explorer");
-        this.mainStage.setResizable(false);
+        stage.setScene(mainScene);
+        stage.setTitle("File explorer");
+        stage.setResizable(false);
 
         icons.setOnAction(iconEvent -> getHostServices().showDocument("https://www.flaticon.com/authors/wahyu-adam"));
         icons.getStyleClass().add("label");
@@ -57,7 +60,7 @@ public class MainWindow extends Application {
 
         this.tabPage();
         bp.setCenter(this.tabPane);
-        this.mainStage.show();
+        stage.show();
     }
 
     private void changeTheme(String theme) {
@@ -82,13 +85,13 @@ public class MainWindow extends Application {
                 } else if (t.getText().equals("Settings")) {
                     t.setContent(this.settingsTab());
                 } else {
-                    t.setContent(this.folderTab());
+                    t.setContent(this.folderTab(this.ml.getActiveFile()));
                 }
             }
         } else {
             Tab t = tabPane.getSelectionModel().getSelectedItem();
             t.setContent(null);
-            t.setContent(this.folderTab());
+            t.setContent(this.folderTab(this.ml.getActiveFile()));
         }
     }
 
@@ -133,7 +136,7 @@ public class MainWindow extends Application {
                 tabPane.getSelectionModel().select(tabPane.getTabs().size() - 2);
             }
         });
-        tabPane.getTabs().addAll(new Tab("Home", this.homeTab()), new Tab("Test folder", this.folderTab()), addTab);
+        tabPane.getTabs().addAll(new Tab("Home", this.homeTab()), addTab);
     }
 
     private BorderPane homeTab() {
@@ -150,7 +153,7 @@ public class MainWindow extends Application {
         pinnedBP.setCenter(pinnedFP);
         TitledPane pinned = new TitledPane("Pinned  - - - - - - ", pinnedBP);
 
-        diskBP = new BorderPane();
+        BorderPane diskBP = new BorderPane();
         diskBP.getStyleClass().add("home-border-pane");
         FlowPane diskFP = new FlowPane();
         for (DiskClass d : this.ml.getDisks()) {
@@ -169,7 +172,8 @@ public class MainWindow extends Application {
 
         return homeBP;
     }
-    private BorderPane folderTab() {
+    private BorderPane folderTab(File file) {
+        this.ml.setActiveFile(file);
         BorderPane folderBP = new BorderPane();
         folderBP.getStyleClass().add("home-border-pane");
         ScrollPane folderSP = new ScrollPane();
@@ -178,16 +182,33 @@ public class MainWindow extends Application {
         folderSP.setOnMouseExited(e -> folderSP.lookup(".scroll-bar").setStyle("bar-width: bar-skinny; bar-height: bar-skinny"));
         FlowPane fileFP = new FlowPane();
         fileFP.setPrefWidth(950);
-        for (int i = 0; i < 50; i++) {
-            fileFP.getChildren().add(this.fileUI(this.ml.isListView(), null, "Testovane " + i));
+        int count = 0;
+        if (file.isDirectory()) {
+            if (file.listFiles() != null) {
+                for (File f : Objects.requireNonNull(file.listFiles())) {
+                    if (!f.isHidden()) {
+                        fileFP.getChildren().add(this.fileUI(this.ml.isListView(), f, f.getName()));
+                        count++;
+                    }
+                }
+            }
         }
         fileFP.setPadding(new Insets(20));
         fileFP.setHgap(10);
         fileFP.setVgap(10);
         folderSP.setContent(fileFP);
 
-        folderBP.setTop(this.setTopBar());
-        folderBP.setBottom(this.setBottomBar());
+        HBox topBar = this.setTopBar();
+        HBox addressBox = (HBox) topBar.getChildren().get(0);
+        Label address = (Label) addressBox.getChildren().get(3);
+        address.getStyleClass().add("top-bar-label");
+        address.setText(file.getPath());
+        folderBP.setTop(topBar);
+
+        HBox bottomBar = this.setBottomBar();
+        Label counter = (Label) bottomBar.getChildren().get(0);
+        counter.setText("Count: " + count);
+        folderBP.setBottom(bottomBar);
         folderBP.setCenter(folderSP);
         return folderBP;
     }
@@ -217,7 +238,8 @@ public class MainWindow extends Application {
         sameTabButton.selectedProperty().addListener(e -> this.ml.setOpenOnSame(true));
         RadioButton newTabButton = new RadioButton("New tab");
         newTabButton.selectedProperty().addListener(e -> this.ml.setOpenOnSame(false));
-        sameTabButton.setSelected(true);
+        sameTabButton.setSelected(this.ml.isOpenOnSame());
+        newTabButton.setSelected(!this.ml.isOpenOnSame());
         ToggleGroup toggleWhere = new ToggleGroup();
         sameTabButton.setToggleGroup(toggleWhere);
         newTabButton.setToggleGroup(toggleWhere);
@@ -339,7 +361,8 @@ public class MainWindow extends Application {
         order.setDisable(true);
         more.getItems().addAll(copy, cut, paste, rename, newMenuItem, delete, order, settings);
 
-        Label address = new Label("C:/TEST/TSET");
+        Label address = new Label("");
+        address.setMinWidth(600);
         address.getStyleClass().add("top-bar-label");
         HBox moreHBox = new HBox(more);
         moreHBox.setAlignment(Pos.CENTER_RIGHT);
@@ -347,7 +370,7 @@ public class MainWindow extends Application {
         addressHBox.setSpacing(5);
         addressHBox.setAlignment(Pos.CENTER_LEFT);
         HBox topBar = new HBox(addressHBox, moreHBox);
-        topBar.setSpacing(700);
+        topBar.setSpacing(200);
         topBar.setPadding(new Insets(2));
         topBar.getStyleClass().add("hbox-bar");
         return topBar;
@@ -409,11 +432,11 @@ public class MainWindow extends Application {
         control.setOnMouseEntered(e -> diskUI.setStyle("-fx-background-color: default-color"));
         control.setOnMouseExited(e -> diskUI.setStyle("-fx-background-color: elevated-background-color"));
         control.setOnAction(e -> {
-            System.out.println(d.getPath());
             if (this.ml.isOpenOnSame()) {
                 this.tabPane.getTabs().remove(this.tabPane.getTabs().get(this.tabPane.getSelectionModel().getSelectedIndex()));
             }
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab("Test folder more", this.folderTab()));
+            File file = new File(d.getPath());
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab(d.getName(), this.folderTab(file)));
             this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
         });
         StackPane diskSP = new StackPane(diskUI, control);
@@ -443,46 +466,89 @@ public class MainWindow extends Application {
     }
     private HBox fileUI(boolean list, File file, String name) {
         HBox fileBox = new HBox();
+        BasicFileAttributes attr;
+        try {
+            attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         fileBox.getStyleClass().add("file-box");
         if (list) {
+            String time = attr.lastModifiedTime().toString();
+            time = time.replace("T" , ", ").replace("Z", "");
+            int index = time.lastIndexOf(":");
+            time = time.substring(0, index);
+
             HBox listBox = new HBox();
             HBox nameBox = new HBox();
-            Label date = new Label("Date");
-            ImageView icon = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/folder_small.png")).toExternalForm()));
+            Label date = new Label(time);
+            ImageView icon;
+            if (file.isDirectory()) {
+                icon = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/folder_small.png")).toExternalForm()));
+            } else {
+                icon = iconToImageView(file);
+            }
             Label fileName = new Label(name);
+            fileName.setMinWidth(500);
             nameBox.getChildren().addAll(icon, fileName);
             nameBox.setSpacing(20);
             nameBox.setAlignment(Pos.CENTER_LEFT);
             nameBox.setPrefWidth(200);
 
-            listBox.setStyle("-fx-padding: 10px; -fx-alignment: center-left;-fx-pref-width: 900px; -fx-pref-height: 35; -fx-spacing: 500");
+            listBox.setStyle("-fx-padding: 10px; -fx-alignment: center-left;-fx-pref-width: 900px; -fx-pref-height: 35; -fx-spacing: 100px;");
             listBox.getChildren().addAll(nameBox, date);
 
             Button control = new Button();
             control.setStyle("-fx-pref-height: 40px; -fx-pref-width: 900px; -fx-background-color: transparent");
-            control.setContextMenu(this.setRightClickMenu(0));
-            control.setOnMouseEntered(e -> fileBox.setStyle("-fx-background-color: default-color"));
-            control.setOnMouseExited(e -> fileBox.setStyle("-fx-background-color: elevated-background-color"));
-            StackPane listSP = new StackPane(listBox, control);
+            this.setupControlButtonFile(control, fileBox, file);
 
+            StackPane listSP = new StackPane(listBox, control);
             fileBox.getChildren().add(listSP);
         } else {
             VBox objectBox = new VBox();
-            ImageView icon = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/folder.png")).toExternalForm()));
+            ImageView icon;
+            if (file.isDirectory()) {
+                icon = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/folder.png")).toExternalForm()));
+            } else {
+                icon = iconToImageView(file);
+            }
             Label fileName = new Label(name);
             objectBox.getChildren().addAll(icon, fileName);
             objectBox.setStyle("-fx-padding: 20px; -fx-spacing: 20px; -fx-alignment: center; -fx-pref-width: 100px; -fx-pref-height: 200px");
 
             Button control = new Button();
             control.setStyle("-fx-pref-height: 210px; -fx-pref-width: 170px; -fx-background-color: transparent");
-            control.setContextMenu(this.setRightClickMenu(0));
-            control.setOnMouseEntered(e -> fileBox.setStyle("-fx-background-color: default-color"));
-            control.setOnMouseExited(e -> fileBox.setStyle("-fx-background-color: elevated-background-color"));
+            this.setupControlButtonFile(control, fileBox, file);
             StackPane objectSP = new StackPane(objectBox, control);
-
             fileBox.getChildren().add(objectSP);
         }
         return fileBox;
+    }
+
+    private void setupControlButtonFile(Button control, HBox fileBox, File file) {
+        control.setContextMenu(this.setRightClickMenu(0));
+        control.setOnMouseEntered(e -> fileBox.setStyle("-fx-background-color: default-color"));
+        control.setOnMouseExited(e -> fileBox.setStyle("-fx-background-color: elevated-background-color"));
+
+        control.setOnAction(e -> {
+            if (file.isDirectory()) {
+                if (this.ml.isOpenOnSame()) {
+                    this.tabPane.getTabs().remove(this.tabPane.getTabs().get(this.tabPane.getSelectionModel().getSelectedIndex()));
+                }
+                File f = new File(file.getPath());
+                this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab(file.getName(), this.folderTab(f)));
+                this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
+            }
+        });
+    }
+    private ImageView iconToImageView(File file) {
+        ImageView icon;
+        Icon i = FileSystemView.getFileSystemView().getSystemIcon(file);
+        BufferedImage bi = new BufferedImage(i.getIconWidth(), i.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+        i.paintIcon(null, bi.getGraphics(), 0, 0);
+        Image im = SwingFXUtils.toFXImage(bi, null);
+        icon = new ImageView(im);
+        return icon;
     }
 
 }

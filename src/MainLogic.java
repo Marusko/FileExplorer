@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
@@ -5,6 +6,7 @@ import java.util.ArrayList;
 public class MainLogic {
 
     private final ArrayList<DiskClass> disks;
+    private File activeFile = null;
     private boolean listView = true;
     private boolean openOnSame = true;
 
@@ -48,5 +50,12 @@ public class MainLogic {
     }
     public void setOpenOnSame(boolean openOnSame) {
         this.openOnSame = openOnSame;
+    }
+
+    public File getActiveFile() {
+        return activeFile;
+    }
+    public void setActiveFile(File activeFile) {
+        this.activeFile = activeFile;
     }
 }
