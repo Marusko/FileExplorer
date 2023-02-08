@@ -117,7 +117,7 @@
     -fx-background-color: elevated-background-color;
     -fx-background-radius: 10px;
     -fx-pref-width: 250px;
-    -fx-pref-height: 50px;
+    -fx-pref-height: 80px;
 }
 .hbox-disk:hover {
     button-color: default-color;

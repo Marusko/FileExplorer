@@ -19,6 +19,8 @@ public class MainWindow extends Application {
     private final Hyperlink lightThemeC = new Hyperlink("-Light theme colors");
     private final Hyperlink moreLink = new Hyperlink("Github");
 
+    private MainLogic ml;
+
     private Stage mainStage;
     private Scene mainScene;
     private final TabPane tabPane = new TabPane();
@@ -31,6 +33,8 @@ public class MainWindow extends Application {
 
     @Override
     public void start(Stage stage){
+        this.ml = new MainLogic();
+
         this.mainStage = stage;
         BorderPane bp = new BorderPane();
         bp.setLeft(this.sidePage());
@@ -124,7 +128,9 @@ public class MainWindow extends Application {
         diskBP = new BorderPane();
         diskBP.getStyleClass().add("home-border-pane");
         FlowPane diskFP = new FlowPane();
-        diskFP.getChildren().add(this.diskUI("Test", 1, 0.8));
+        for (DiskClass d : this.ml.getDisks()) {
+            diskFP.getChildren().add(this.diskUI(d));
+        }
         diskFP.setPadding(new Insets(20));
         diskFP.setHgap(20);
         diskFP.setVgap(20);
@@ -344,16 +350,23 @@ public class MainWindow extends Application {
         return menu;
     }
 
-    private HBox diskUI(String name, double capacity, double used) {
-        ImageView icon = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/harddisk.png")).toExternalForm()));
+    private HBox diskUI(DiskClass d) {
+        ImageView icon;
+        if (d.isRemovable().equals("false")) {
+            icon = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/harddisk.png")).toExternalForm()));
+        } else {
+            icon = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/flashdrive.png")).toExternalForm()));
+        }
         icon.setFitHeight(50);
         icon.setFitWidth(50);
         VBox diskBox = new VBox();
-        Label diskName = new Label(name);
-        diskName.setStyle("-fx-font-size: 15px");
-        ProgressBar pb = new ProgressBar(used);
-        diskBox.getChildren().addAll(diskName, pb);
-        diskBox.setSpacing(10);
+        Label diskName = new Label(d.getName());
+        diskName.setStyle("-fx-font-size: 15px;");
+        ProgressBar pb = new ProgressBar(d.getUsedPercentage());
+        Label capacity = new Label(d.getFreeCapacity() + " GB free of " + d.getTotalCapacity() + " GB");
+        capacity.setStyle("-fx-font-size: 10px");
+        diskBox.getChildren().addAll(diskName, pb, capacity);
+        diskBox.setSpacing(5);
         diskBox.setAlignment(Pos.CENTER_LEFT);
         HBox diskUI = new HBox(icon, diskBox);
         diskUI.setSpacing(10);
