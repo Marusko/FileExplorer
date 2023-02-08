@@ -72,6 +72,9 @@ public class MainWindow extends Application {
             }
         }
     }
+    private void refresh() {
+
+    }
 
     //UI--------------------------------------
     private VBox sidePage() {
@@ -107,6 +110,14 @@ public class MainWindow extends Application {
     private void tabPage() {
         Tab addTab = new Tab("Add");
         addTab.setClosable(false);
+
+        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
+            if(newTab == addTab) {
+                tabPane.getTabs().add(tabPane.getTabs().size() - 1, this.homeTab());
+                tabPane.getSelectionModel().select(tabPane.getTabs().size() - 2);
+            }
+        });
+
         tabPane.getTabs().addAll(this.homeTab(), this.folderTab(), this.settingsTab(), addTab);
     }
 
