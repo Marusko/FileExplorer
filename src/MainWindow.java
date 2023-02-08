@@ -214,7 +214,9 @@ public class MainWindow extends Application {
         Label whereLabel = new Label("Where to open folders: ");
         whereLabel.getStyleClass().add("settings-label");
         RadioButton sameTabButton = new RadioButton("Same tab");
+        sameTabButton.selectedProperty().addListener(e -> this.ml.setOpenOnSame(true));
         RadioButton newTabButton = new RadioButton("New tab");
+        newTabButton.selectedProperty().addListener(e -> this.ml.setOpenOnSame(false));
         sameTabButton.setSelected(true);
         ToggleGroup toggleWhere = new ToggleGroup();
         sameTabButton.setToggleGroup(toggleWhere);
@@ -223,7 +225,6 @@ public class MainWindow extends Application {
         radioWhereBox.setStyle("-fx-spacing: 10px");
         VBox whereBox = new VBox(whereLabel, radioWhereBox);
         whereBox.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
-        whereBox.setDisable(true);
 
         VBox settingsBox = new VBox(themeBox, extensionBox, hiddenBox, whereBox);
         settingsBox.setStyle("-fx-spacing: 10px");
@@ -407,6 +408,14 @@ public class MainWindow extends Application {
         control.getStyleClass().add("pinned-control-right");
         control.setOnMouseEntered(e -> diskUI.setStyle("-fx-background-color: default-color"));
         control.setOnMouseExited(e -> diskUI.setStyle("-fx-background-color: elevated-background-color"));
+        control.setOnAction(e -> {
+            System.out.println(d.getPath());
+            if (this.ml.isOpenOnSame()) {
+                this.tabPane.getTabs().remove(this.tabPane.getTabs().get(this.tabPane.getSelectionModel().getSelectedIndex()));
+            }
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab("Test folder more", this.folderTab()));
+            this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
+        });
         StackPane diskSP = new StackPane(diskUI, control);
 
         return new HBox(diskSP);

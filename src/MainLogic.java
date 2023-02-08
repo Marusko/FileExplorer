@@ -6,6 +6,7 @@ public class MainLogic {
 
     private final ArrayList<DiskClass> disks;
     private boolean listView = true;
+    private boolean openOnSame = true;
 
     public MainLogic() {
         this.disks = new ArrayList<>();
@@ -25,7 +26,7 @@ public class MainLogic {
                 String s = "(" + root + ")";
                 s = s.replace("\\", "");
                 s = s + fileStore.name();
-                this.disks.add(new DiskClass(s, fileStore.getTotalSpace(), fileStore.getUsableSpace(), fileStore.getAttribute("volume:isRemovable").toString()));
+                this.disks.add(new DiskClass(s, fileStore.getTotalSpace(), fileStore.getUsableSpace(), fileStore.getAttribute("volume:isRemovable").toString(), root.toString()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -40,5 +41,12 @@ public class MainLogic {
     }
     public void setListView(boolean listView) {
         this.listView = listView;
+    }
+
+    public boolean isOpenOnSame() {
+        return openOnSame;
+    }
+    public void setOpenOnSame(boolean openOnSame) {
+        this.openOnSame = openOnSame;
     }
 }

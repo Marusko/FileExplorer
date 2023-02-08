@@ -3,12 +3,14 @@ public class DiskClass {
     private final long freeCapacity;
     private final String name;
     private final String removable;
+    private final String path;
 
-    public DiskClass(String name, long total, long free, String removable) {
+    public DiskClass(String name, long total, long free, String removable, String path) {
         this.name = name;
         this.totalCapacity = total;
         this.freeCapacity = free;
         this.removable = removable;
+        this.path = path;
     }
 
     public String getName() {
@@ -25,5 +27,8 @@ public class DiskClass {
     }
     public String  isRemovable() {
         return removable;
+    }
+    public String getPath() {
+        return path;
     }
 }
