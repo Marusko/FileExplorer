@@ -12,9 +12,14 @@ import java.io.File;
 import java.util.Objects;
 
 public class MainWindow extends Application {
+    public static final String AUTHOR = "Matúš Suský";
+    public static final String VERSION = "0.0.0.1";
+    private final Hyperlink icons = new Hyperlink("-Icons");
+    private final Hyperlink darkThemeC = new Hyperlink("-Dark theme colors");
+    private final Hyperlink lightThemeC = new Hyperlink("-Light theme colors");
+    private final Hyperlink moreLink = new Hyperlink("Github");
 
     private Stage mainStage;
-
     private final TabPane tabPane = new TabPane();
     private BorderPane diskBP;
     private BorderPane pinnedBP;
@@ -35,6 +40,15 @@ public class MainWindow extends Application {
         this.mainStage.setTitle("File explorer");
         this.mainStage.setResizable(false);
 
+        icons.setOnAction(iconEvent -> getHostServices().showDocument("https://www.flaticon.com/authors/wahyu-adam"));
+        icons.getStyleClass().add("label");
+        darkThemeC.setOnAction(iconEvent -> getHostServices().showDocument("https://colorhunt.co/palette/261c2c3e2c415c527f6e85b2"));
+        darkThemeC.getStyleClass().add("label");
+        lightThemeC.setOnAction(iconEvent -> getHostServices().showDocument("https://colorhunt.co/palette/def5e5bcead59ed5c58ec3b0"));
+        lightThemeC.getStyleClass().add("label");
+        moreLink.setOnAction(iconEvent -> getHostServices().showDocument("https://github.com/Marusko/FileExplorer"));
+        moreLink.getStyleClass().add("label");
+        moreLink.setDisable(true);
 
         this.tabPage();
         bp.setCenter(this.tabPane);
@@ -71,11 +85,10 @@ public class MainWindow extends Application {
         //side.setStyle("-fx-background-color: #261C2C");
         return side;
     }
-
     private void tabPage() {
         Tab addTab = new Tab("Add");
         addTab.setClosable(false);
-        tabPane.getTabs().addAll(this.homeTab(), this.folderTab(), addTab);
+        tabPane.getTabs().addAll(this.homeTab(), this.folderTab(), this.settingsTab(), addTab);
     }
 
     private Tab homeTab() {
@@ -135,6 +148,79 @@ public class MainWindow extends Application {
         folderBP.setCenter(folderSP);
         folder.setContent(folderBP);
         return folder;
+    }
+    private Tab settingsTab() {
+        Tab settings = new Tab("Settings");
+
+        Label themeLabel = new Label("Theme: ");
+        themeLabel.getStyleClass().add("settings-label");
+        ComboBox<String> themeChooser = new ComboBox<>();
+        themeChooser.getItems().addAll("Dark", "Light");
+        themeChooser.getSelectionModel().select(0);
+        themeChooser.setOnMouseEntered(e -> themeChooser.setStyle("combo-color: default-color"));
+        themeChooser.setOnMouseExited(e -> themeChooser.setStyle("combo-color: elevated-background-color"));
+        VBox themeBox = new VBox(themeLabel, themeChooser);
+        themeBox.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
+
+        Label extensionLabel = new Label("Show file extensions: ");
+        extensionLabel.getStyleClass().add("settings-label");
+        RadioButton extensionYes = new RadioButton("Yes");
+        RadioButton extensionNo = new RadioButton("No");
+        extensionNo.setSelected(true);
+        ToggleGroup toggle = new ToggleGroup();
+        extensionYes.setToggleGroup(toggle);
+        extensionNo.setToggleGroup(toggle);
+        HBox radioBox = new HBox(extensionYes, extensionNo);
+        radioBox.setStyle("-fx-spacing: 10px");
+        VBox extensionBox = new VBox(extensionLabel, radioBox);
+        extensionBox.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
+        extensionBox.setDisable(true);
+
+        Label hiddenLabel = new Label("Show hidden files: ");
+        hiddenLabel.getStyleClass().add("settings-label");
+        RadioButton hiddenYes = new RadioButton("Yes");
+        RadioButton hiddenNo = new RadioButton("No");
+        hiddenNo.setSelected(true);
+        ToggleGroup toggleHidden = new ToggleGroup();
+        hiddenYes.setToggleGroup(toggleHidden);
+        hiddenNo.setToggleGroup(toggleHidden);
+        HBox radioHiddenBox = new HBox(hiddenYes, hiddenNo);
+        radioHiddenBox.setStyle("-fx-spacing: 10px");
+        VBox hiddenBox = new VBox(hiddenLabel, radioHiddenBox);
+        hiddenBox.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
+        hiddenBox.setDisable(true);
+
+        Label whereLabel = new Label("Where to open folders: ");
+        whereLabel.getStyleClass().add("settings-label");
+        RadioButton sameTabButton = new RadioButton("Same tab");
+        RadioButton newTabButton = new RadioButton("New tab");
+        sameTabButton.setSelected(true);
+        ToggleGroup toggleWhere = new ToggleGroup();
+        sameTabButton.setToggleGroup(toggleWhere);
+        newTabButton.setToggleGroup(toggleWhere);
+        VBox radioWhereBox = new VBox(sameTabButton, newTabButton);
+        radioWhereBox.setStyle("-fx-spacing: 10px");
+        VBox whereBox = new VBox(whereLabel, radioWhereBox);
+        whereBox.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
+        whereBox.setDisable(true);
+
+        VBox settingsBox = new VBox(themeBox, extensionBox, hiddenBox, whereBox);
+        settingsBox.setStyle("-fx-spacing: 10px");
+
+        Label authorLabel = new Label("Made by: " + MainWindow.AUTHOR);
+        Label versionLabel = new Label("Version: " + MainWindow.VERSION);
+        Label moreOn = new Label("More on: ");
+        HBox moreBox = new HBox(moreOn, moreLink);
+        Label copy = new Label("Copyright: ");
+        VBox copyBox = new VBox(copy, icons, darkThemeC, lightThemeC);
+        VBox infoBox = new VBox(authorLabel, versionLabel, moreBox, copyBox);
+        infoBox.setStyle("-fx-spacing: 10px");
+
+        VBox tabBox = new VBox(settingsBox, infoBox);
+        tabBox.setStyle("-fx-spacing: 70px; -fx-padding: 50px");
+        settings.setContent(tabBox);
+
+        return settings;
     }
 
     private HBox setBottomBar() {
@@ -215,7 +301,6 @@ public class MainWindow extends Application {
         topBar.getStyleClass().add("hbox-bar");
         return topBar;
     }
-
     private ContextMenu setRightClickMenu(int onFile) {
         ContextMenu menu = new ContextMenu();
         switch (onFile) {

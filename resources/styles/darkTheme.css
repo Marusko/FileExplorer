@@ -192,3 +192,41 @@
 .progress-bar .bar{
     -fx-background-color: selected-color;
 }
+.settings-label{
+    -fx-font-size: 15px;
+    -fx-font-weight: bold
+}
+.combo-box{
+    combo-color: elevated-background-color;
+    -fx-background-color: combo-color;
+    -fx-pref-width: 200px;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold
+}
+.combo-box .cell:selected{
+    -fx-background-color: elevated-background-color;
+    -fx-text-fill: white;
+    -fx-text-background-color: transparent;
+}
+.combo-box .cell:hover{
+    -fx-background-color: default-color;
+    -fx-text-fill: white;
+    -fx-text-background-color: transparent;
+}
+.radio-button {
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.radio-button .radio{
+    -fx-background-color: elevated-background-color;
+}
+.radio-button .radio:hover{
+    -fx-background-color: default-color;
+}
+.radio-button:selected .radio .dot{
+    -fx-background-color: selected-color;
+}
+.radio-button .radio .dot{
+    -fx-padding: 5px;
+}
