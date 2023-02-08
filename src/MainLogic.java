@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class MainLogic {
 
     private final ArrayList<DiskClass> disks;
+    private boolean listView = true;
 
     public MainLogic() {
         this.disks = new ArrayList<>();
@@ -34,4 +35,10 @@ public class MainLogic {
         return this.disks;
     }
 
+    public boolean isListView() {
+        return listView;
+    }
+    public void setListView(boolean listView) {
+        this.listView = listView;
+    }
 }

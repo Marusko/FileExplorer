@@ -72,17 +72,23 @@ public class MainWindow extends Application {
             }
         }
     }
-    private void refresh() {
-        for (Tab t : tabPane.getTabs()) {
-            t.setContent(null);
-            if (t.getText().equals("Home")) {
-                this.ml.loadDrives();
-                t.setContent(this.homeTab());
-            } else if (t.getText().equals("Settings")) {
-                t.setContent(this.settingsTab());
-            } else {
-                t.setContent(this.folderTab());
+    private void refresh(boolean all) {
+        if (all) {
+            for (Tab t : tabPane.getTabs()) {
+                t.setContent(null);
+                if (t.getText().equals("Home")) {
+                    this.ml.loadDrives();
+                    t.setContent(this.homeTab());
+                } else if (t.getText().equals("Settings")) {
+                    t.setContent(this.settingsTab());
+                } else {
+                    t.setContent(this.folderTab());
+                }
             }
+        } else {
+            Tab t = tabPane.getSelectionModel().getSelectedItem();
+            t.setContent(null);
+            t.setContent(this.folderTab());
         }
     }
 
@@ -159,7 +165,6 @@ public class MainWindow extends Application {
         homeAccordion.setExpandedPane(homeAccordion.getPanes().get(1));
 
         homeBP.setTop(this.setTopBar());
-        homeBP.setBottom(this.setBottomBar());
         homeBP.setCenter(homeAccordion);
 
         return homeBP;
@@ -174,7 +179,7 @@ public class MainWindow extends Application {
         FlowPane fileFP = new FlowPane();
         fileFP.setPrefWidth(950);
         for (int i = 0; i < 50; i++) {
-            fileFP.getChildren().add(this.fileUI(true, null, "Testovane " + i));
+            fileFP.getChildren().add(this.fileUI(this.ml.isListView(), null, "Testovane " + i));
         }
         fileFP.setPadding(new Insets(20));
         fileFP.setHgap(10);
@@ -259,6 +264,10 @@ public class MainWindow extends Application {
 
         Button listView = new Button();
         listView.getStyleClass().add("bottom-bar-button");
+        listView.setOnAction(e -> {
+            this.ml.setListView(true);
+            this.refresh(false);
+        });
         ImageView iconL = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/form.png")).toExternalForm()));
         iconL.setFitWidth(20);
         iconL.setFitHeight(20);
@@ -266,6 +275,10 @@ public class MainWindow extends Application {
 
         Button objectView = new Button();
         objectView.getStyleClass().add("bottom-bar-button");
+        objectView.setOnAction(e -> {
+            this.ml.setListView(false);
+            this.refresh(false);
+        });
         ImageView iconO = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/blog.png")).toExternalForm()));
         iconO.setFitWidth(20);
         iconO.setFitHeight(20);
@@ -301,7 +314,7 @@ public class MainWindow extends Application {
         iconR.setFitWidth(20);
         iconR.setFitHeight(20);
         refresh.setGraphic(iconR);
-        refresh.setOnAction(e -> this.refresh());
+        refresh.setOnAction(e -> this.refresh(true));
 
         MenuButton more = new MenuButton();
         more.getStyleClass().add("top-bar-button");
