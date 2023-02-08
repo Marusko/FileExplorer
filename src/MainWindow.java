@@ -73,7 +73,17 @@ public class MainWindow extends Application {
         }
     }
     private void refresh() {
-
+        for (Tab t : tabPane.getTabs()) {
+            t.setContent(null);
+            if (t.getText().equals("Home")) {
+                this.ml.loadDrives();
+                t.setContent(this.homeTab());
+            } else if (t.getText().equals("Settings")) {
+                t.setContent(this.settingsTab());
+            } else {
+                t.setContent(this.folderTab());
+            }
+        }
     }
 
     //UI--------------------------------------
@@ -113,16 +123,14 @@ public class MainWindow extends Application {
 
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if(newTab == addTab) {
-                tabPane.getTabs().add(tabPane.getTabs().size() - 1, this.homeTab());
+                tabPane.getTabs().add(tabPane.getTabs().size() - 1, new Tab("Home", this.homeTab()));
                 tabPane.getSelectionModel().select(tabPane.getTabs().size() - 2);
             }
         });
-
-        tabPane.getTabs().addAll(this.homeTab(), this.folderTab(), addTab);
+        tabPane.getTabs().addAll(new Tab("Home", this.homeTab()), new Tab("Test folder", this.folderTab()), addTab);
     }
 
-    private Tab homeTab() {
-        Tab home = new Tab("Home");
+    private BorderPane homeTab() {
         BorderPane homeBP = new BorderPane();
         Accordion homeAccordion = new Accordion();
 
@@ -153,12 +161,10 @@ public class MainWindow extends Application {
         homeBP.setTop(this.setTopBar());
         homeBP.setBottom(this.setBottomBar());
         homeBP.setCenter(homeAccordion);
-        home.setContent(homeBP);
 
-        return home;
+        return homeBP;
     }
-    private Tab folderTab() {
-        Tab folder = new Tab("Test folder");
+    private BorderPane folderTab() {
         BorderPane folderBP = new BorderPane();
         folderBP.getStyleClass().add("home-border-pane");
         ScrollPane folderSP = new ScrollPane();
@@ -178,12 +184,9 @@ public class MainWindow extends Application {
         folderBP.setTop(this.setTopBar());
         folderBP.setBottom(this.setBottomBar());
         folderBP.setCenter(folderSP);
-        folder.setContent(folderBP);
-        return folder;
+        return folderBP;
     }
-    private Tab settingsTab() {
-        Tab settings = new Tab("Settings");
-
+    private VBox settingsTab() {
         Label themeLabel = new Label("Theme: ");
         themeLabel.getStyleClass().add("settings-label");
         ComboBox<String> themeChooser = new ComboBox<>();
@@ -231,9 +234,8 @@ public class MainWindow extends Application {
 
         VBox tabBox = new VBox(settingsBox, infoBox);
         tabBox.setStyle("-fx-spacing: 70px; -fx-padding: 50px");
-        settings.setContent(tabBox);
 
-        return settings;
+        return tabBox;
     }
 
     private VBox setSettingsRadioButtons(Label label) {
@@ -299,6 +301,7 @@ public class MainWindow extends Application {
         iconR.setFitWidth(20);
         iconR.setFitHeight(20);
         refresh.setGraphic(iconR);
+        refresh.setOnAction(e -> this.refresh());
 
         MenuButton more = new MenuButton();
         more.getStyleClass().add("top-bar-button");
@@ -313,7 +316,7 @@ public class MainWindow extends Application {
         MenuItem delete = new MenuItem("Delete");
         MenuItem settings = new MenuItem("Settings");
         settings.setOnAction(e -> {
-            tabPane.getTabs().add(tabPane.getTabs().size() - 1, this.settingsTab());
+            tabPane.getTabs().add(tabPane.getTabs().size() - 1, new Tab("Settings", this.settingsTab()));
             tabPane.getSelectionModel().select(tabPane.getTabs().size() - 2);
         });
         MenuItem rename = new MenuItem("Rename");

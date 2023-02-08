@@ -11,7 +11,8 @@ public class MainLogic {
         this.loadDrives();
     }
 
-    private void loadDrives() {
+    public void loadDrives() {
+        this.disks.clear();
         for (Path root : FileSystems.getDefault().getRootDirectories()) {
             FileStore fileStore;
             try {
