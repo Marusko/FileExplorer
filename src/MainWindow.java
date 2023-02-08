@@ -286,7 +286,9 @@ public class MainWindow extends Application {
         MenuItem settings = new MenuItem("Settings");
         MenuItem rename = new MenuItem("Rename");
         MenuItem newMenuItem = new MenuItem("New folder");
-        more.getItems().addAll(copy, cut, paste, rename, newMenuItem, delete, settings);
+        MenuItem order = new MenuItem("Order");
+        order.setDisable(true);
+        more.getItems().addAll(copy, cut, paste, rename, newMenuItem, delete, order, settings);
 
         Label address = new Label("C:/TEST/TSET");
         address.getStyleClass().add("top-bar-label");
@@ -311,7 +313,9 @@ public class MainWindow extends Application {
                 MenuItem cut = new MenuItem("Cut");
                 MenuItem copy = new MenuItem("Copy");
                 MenuItem delete = new MenuItem("Delete");
-                menu.getItems().addAll(copy, cut, delete, pin, pathItem, properties);
+                MenuItem select = new MenuItem("Select");
+                select.setDisable(true);
+                menu.getItems().addAll(select, copy, cut, delete, pin, pathItem, properties);
             }
             case 1 -> {
                 MenuItem properties1 = new MenuItem("Properties");
