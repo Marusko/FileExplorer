@@ -58,13 +58,14 @@ public class MainWindow extends Application {
 
     private void changeTheme(String theme) {
         switch (theme) {
-            case "Dark":mainScene.getStylesheets().clear();
-                        mainScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles/darkTheme.css")).toExternalForm());
-                        break;
-
-            case "Light":mainScene.getStylesheets().clear();
-                        mainScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles/lightTheme.css")).toExternalForm());
-                        break;
+            case "Dark" -> {
+                mainScene.getStylesheets().clear();
+                mainScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles/darkTheme.css")).toExternalForm());
+            }
+            case "Light" -> {
+                mainScene.getStylesheets().clear();
+                mainScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles/lightTheme.css")).toExternalForm());
+            }
         }
     }
 
@@ -178,31 +179,11 @@ public class MainWindow extends Application {
         themeBox.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
 
         Label extensionLabel = new Label("Show file extensions: ");
-        extensionLabel.getStyleClass().add("settings-label");
-        RadioButton extensionYes = new RadioButton("Yes");
-        RadioButton extensionNo = new RadioButton("No");
-        extensionNo.setSelected(true);
-        ToggleGroup toggle = new ToggleGroup();
-        extensionYes.setToggleGroup(toggle);
-        extensionNo.setToggleGroup(toggle);
-        HBox radioBox = new HBox(extensionYes, extensionNo);
-        radioBox.setStyle("-fx-spacing: 10px");
-        VBox extensionBox = new VBox(extensionLabel, radioBox);
-        extensionBox.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
+        VBox extensionBox = setSettingsRadioButtons(extensionLabel);
         extensionBox.setDisable(true);
 
         Label hiddenLabel = new Label("Show hidden files: ");
-        hiddenLabel.getStyleClass().add("settings-label");
-        RadioButton hiddenYes = new RadioButton("Yes");
-        RadioButton hiddenNo = new RadioButton("No");
-        hiddenNo.setSelected(true);
-        ToggleGroup toggleHidden = new ToggleGroup();
-        hiddenYes.setToggleGroup(toggleHidden);
-        hiddenNo.setToggleGroup(toggleHidden);
-        HBox radioHiddenBox = new HBox(hiddenYes, hiddenNo);
-        radioHiddenBox.setStyle("-fx-spacing: 10px");
-        VBox hiddenBox = new VBox(hiddenLabel, radioHiddenBox);
-        hiddenBox.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
+        VBox hiddenBox = setSettingsRadioButtons(hiddenLabel);
         hiddenBox.setDisable(true);
 
         Label whereLabel = new Label("Where to open folders: ");
@@ -236,6 +217,21 @@ public class MainWindow extends Application {
         settings.setContent(tabBox);
 
         return settings;
+    }
+
+    private VBox setSettingsRadioButtons(Label label) {
+        label.getStyleClass().add("settings-label");
+        RadioButton yes = new RadioButton("Yes");
+        RadioButton no = new RadioButton("No");
+        no.setSelected(true);
+        ToggleGroup toggleGroup = new ToggleGroup();
+        yes.setToggleGroup(toggleGroup);
+        no.setToggleGroup(toggleGroup);
+        HBox radioBox = new HBox(yes, no);
+        radioBox.setStyle("-fx-spacing: 10px");
+        VBox completeBox = new VBox(label, radioBox);
+        completeBox.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
+        return completeBox;
     }
 
     private HBox setBottomBar() {
