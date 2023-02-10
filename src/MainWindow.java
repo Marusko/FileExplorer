@@ -4,13 +4,18 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-import javax.swing.*;
+import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -101,21 +106,46 @@ public class MainWindow extends Application {
         side.getStyleClass().add("vbox");
         Button desktop = new Button("Desktop");
         desktop.getStyleClass().add("side-button");
+        desktop.setOnAction(e -> {
+            FileSystemView filesys = FileSystemView.getFileSystemView();
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab("Desktop", this.folderTab(new File(filesys.getHomeDirectory().toURI()))));
+            this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
+        });
 
         Button download = new Button("Download");
         download.getStyleClass().add("side-button");
+        download.setOnAction(e -> {
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab("Downloads", this.folderTab(new File("C:/Users/" + System.getProperty("user.name") + "/Downloads/"))));
+            this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
+        });
 
-        Button docs = new Button("Docs");
+        Button docs = new Button("Documents");
         docs.getStyleClass().add("side-button");
+        docs.setOnAction(e -> {
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab("Documents", this.folderTab(new File("C:/Users/" + System.getProperty("user.name") + "/Documents/"))));
+            this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
+        });
 
         Button pics = new Button("Pictures");
         pics.getStyleClass().add("side-button");
+        pics.setOnAction(e -> {
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab("Pictures", this.folderTab(new File("C:/Users/" + System.getProperty("user.name") + "/Pictures/"))));
+            this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
+        });
 
         Button music = new Button("Music");
         music.getStyleClass().add("side-button");
+        music.setOnAction(e -> {
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab("Music", this.folderTab(new File("C:/Users/" + System.getProperty("user.name") + "/Music/"))));
+            this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
+        });
 
         Button videos = new Button("Videos");
         videos.getStyleClass().add("side-button");
+        videos.setOnAction(e -> {
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab("Videos", this.folderTab(new File("C:/Users/" + System.getProperty("user.name") + "/Videos/"))));
+            this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
+        });
 
         side.getChildren().addAll(desktop, download, docs, pics, music, videos);
         side.setMaxWidth(200);
@@ -123,7 +153,6 @@ public class MainWindow extends Application {
         side.setSpacing(10);
         side.setAlignment(Pos.TOP_CENTER);
         side.setPadding(new Insets(10));
-        //side.setStyle("-fx-background-color: #261C2C");
         return side;
     }
     private void tabPage() {
@@ -532,12 +561,21 @@ public class MainWindow extends Application {
 
         control.setOnAction(e -> {
             if (file.isDirectory()) {
+                int index = this.tabPane.getTabs().size() - 1;
                 if (this.ml.isOpenOnSame()) {
-                    this.tabPane.getTabs().remove(this.tabPane.getTabs().get(this.tabPane.getSelectionModel().getSelectedIndex()));
+                    index = this.tabPane.getSelectionModel().getSelectedIndex();
+                    this.tabPane.getTabs().remove(this.tabPane.getTabs().get(index));
                 }
                 File f = new File(file.getPath());
-                this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab(file.getName(), this.folderTab(f)));
-                this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
+                this.tabPane.getTabs().add(index, new Tab(file.getName(), this.folderTab(f)));
+                this.tabPane.getSelectionModel().select(index);
+            } else {
+                try {
+                    Desktop.getDesktop().open(file);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                this.refresh(false);
             }
         });
     }
