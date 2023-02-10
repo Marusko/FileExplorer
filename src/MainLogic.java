@@ -1,3 +1,5 @@
+import javafx.scene.control.Tab;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -12,6 +14,7 @@ public class MainLogic {
     private boolean doubleClick = true;
     private boolean showHidden = false;
     private boolean showExtensions = false;
+    private Tab settingsTab = null;
 
     public MainLogic() {
         this.disks = new ArrayList<>();
@@ -81,5 +84,12 @@ public class MainLogic {
     }
     public void setShowExtensions(boolean showExtensions) {
         this.showExtensions = showExtensions;
+    }
+
+    public Tab getSettingsTab() {
+        return settingsTab;
+    }
+    public void setSettingsTab(Tab settingsTab) {
+        this.settingsTab = settingsTab;
     }
 }

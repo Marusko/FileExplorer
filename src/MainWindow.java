@@ -261,7 +261,6 @@ public class MainWindow extends Application {
 
         Label extensionLabel = new Label("Show file extensions: ");
         VBox extensionBox = setSettingsRadioButtons(extensionLabel, 0);
-        //extensionBox.setDisable(true);
 
         Label hiddenLabel = new Label("Show hidden files: ");
         VBox hiddenBox = setSettingsRadioButtons(hiddenLabel, 1);
@@ -285,7 +284,15 @@ public class MainWindow extends Application {
         VBox whereBox = new VBox(whereLabel, radioWhereBox);
         whereBox.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
 
-        VBox settingsBox = new VBox(themeBox, extensionBox, hiddenBox, doubleClickBox, whereBox);
+        GridPane settingsGP = new GridPane();
+        settingsGP.add(extensionBox, 0, 0);
+        settingsGP.add(hiddenBox, 1, 0);
+        settingsGP.add(doubleClickBox, 0, 1);
+        settingsGP.add(whereBox, 1, 1);
+        settingsGP.setHgap(30);
+        settingsGP.setVgap(30);
+
+        VBox settingsBox = new VBox(themeBox, settingsGP);
         settingsBox.setStyle("-fx-spacing: 10px");
 
         Label authorLabel = new Label("Made by: " + MainWindow.AUTHOR);
@@ -421,8 +428,15 @@ public class MainWindow extends Application {
         MenuItem delete = new MenuItem("Delete");
         MenuItem settings = new MenuItem("Settings");
         settings.setOnAction(e -> {
-            tabPane.getTabs().add(tabPane.getTabs().size() - 1, new Tab("Settings", this.settingsTab()));
-            tabPane.getSelectionModel().select(tabPane.getTabs().size() - 2);
+            if (this.ml.getSettingsTab() == null) {
+                Tab settingsTab = new Tab("Settings", this.settingsTab());
+                settingsTab.setOnClosed(l -> this.ml.setSettingsTab(null));
+                tabPane.getTabs().add(tabPane.getTabs().size() - 1, settingsTab);
+                tabPane.getSelectionModel().select(tabPane.getTabs().size() - 2);
+                this.ml.setSettingsTab(settingsTab);
+            } else {
+                tabPane.getSelectionModel().select(this.ml.getSettingsTab());
+            }
         });
         MenuItem rename = new MenuItem("Rename");
         MenuItem newMenuItem = new MenuItem("New folder");
@@ -560,7 +574,9 @@ public class MainWindow extends Application {
 
             if (!this.ml.isShowExtensions() && !file.isDirectory()) {
                 int i = name.lastIndexOf(".");
-                name = name.substring(0, i);
+                if (i != -1) {
+                    name = name.substring(0, i);
+                }
             }
 
             Label fileName = new Label(name);
