@@ -9,6 +9,7 @@ public class MainLogic {
     private File activeFile = null;
     private boolean listView = true;
     private boolean openOnSame = true;
+    private boolean doubleClick = true;
 
     public MainLogic() {
         this.disks = new ArrayList<>();
@@ -57,5 +58,12 @@ public class MainLogic {
     }
     public void setActiveFile(File activeFile) {
         this.activeFile = activeFile;
+    }
+
+    public boolean isDoubleClick() {
+        return doubleClick;
+    }
+    public void setDoubleClick(boolean doubleClick) {
+        this.doubleClick = doubleClick;
     }
 }

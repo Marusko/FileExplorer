@@ -10,6 +10,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
@@ -254,12 +255,15 @@ public class MainWindow extends Application {
         themeBox.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
 
         Label extensionLabel = new Label("Show file extensions: ");
-        VBox extensionBox = setSettingsRadioButtons(extensionLabel);
+        VBox extensionBox = setSettingsRadioButtons(extensionLabel, 0);
         extensionBox.setDisable(true);
 
         Label hiddenLabel = new Label("Show hidden files: ");
-        VBox hiddenBox = setSettingsRadioButtons(hiddenLabel);
+        VBox hiddenBox = setSettingsRadioButtons(hiddenLabel, 1);
         hiddenBox.setDisable(true);
+
+        Label doubleClickLabel = new Label("Use double click: ");
+        VBox doubleClickBox = setSettingsRadioButtons(doubleClickLabel, 2);
 
         Label whereLabel = new Label("Where to open folders: ");
         whereLabel.getStyleClass().add("settings-label");
@@ -277,7 +281,7 @@ public class MainWindow extends Application {
         VBox whereBox = new VBox(whereLabel, radioWhereBox);
         whereBox.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
 
-        VBox settingsBox = new VBox(themeBox, extensionBox, hiddenBox, whereBox);
+        VBox settingsBox = new VBox(themeBox, extensionBox, hiddenBox, doubleClickBox, whereBox);
         settingsBox.setStyle("-fx-spacing: 10px");
 
         Label authorLabel = new Label("Made by: " + MainWindow.AUTHOR);
@@ -295,11 +299,21 @@ public class MainWindow extends Application {
         return tabBox;
     }
 
-    private VBox setSettingsRadioButtons(Label label) {
+    private VBox setSettingsRadioButtons(Label label, int submenu) {
         label.getStyleClass().add("settings-label");
         RadioButton yes = new RadioButton("Yes");
         RadioButton no = new RadioButton("No");
-        no.setSelected(true);
+        switch (submenu) {
+            case 0 -> yes.setSelected(true);
+            case 1 -> no.setSelected(true);
+            case 2 -> {
+                yes.setSelected(this.ml.isDoubleClick());
+                yes.selectedProperty().addListener(e -> this.ml.setDoubleClick(true));
+                no.setSelected(!this.ml.isDoubleClick());
+                no.selectedProperty().addListener(e -> this.ml.setDoubleClick(false));
+            }
+        }
+
         ToggleGroup toggleGroup = new ToggleGroup();
         yes.setToggleGroup(toggleGroup);
         no.setToggleGroup(toggleGroup);
@@ -560,24 +574,38 @@ public class MainWindow extends Application {
         control.setOnMouseExited(e -> fileBox.setStyle("-fx-background-color: elevated-background-color"));
 
         control.setOnAction(e -> {
-            if (file.isDirectory()) {
-                int index = this.tabPane.getTabs().size() - 1;
-                if (this.ml.isOpenOnSame()) {
-                    index = this.tabPane.getSelectionModel().getSelectedIndex();
-                    this.tabPane.getTabs().remove(this.tabPane.getTabs().get(index));
-                }
-                File f = new File(file.getPath());
-                this.tabPane.getTabs().add(index, new Tab(file.getName(), this.folderTab(f)));
-                this.tabPane.getSelectionModel().select(index);
+            if (!this.ml.isDoubleClick()) {
+                clickOnFile(file);
             } else {
-                try {
-                    Desktop.getDesktop().open(file);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-                this.refresh(false);
+                fileBox.setStyle("-fx-background-color: selected-color");
             }
         });
+        control.setOnMouseClicked(e -> {
+            if(e.getButton().equals(MouseButton.PRIMARY)){
+                if(e.getClickCount() == 2){
+                    clickOnFile(file);
+                }
+            }
+        });
+    }
+    private void clickOnFile(File file) {
+        if (file.isDirectory()) {
+            int index = this.tabPane.getTabs().size() - 1;
+            if (this.ml.isOpenOnSame()) {
+                index = this.tabPane.getSelectionModel().getSelectedIndex();
+                this.tabPane.getTabs().remove(this.tabPane.getTabs().get(index));
+            }
+            File f = new File(file.getPath());
+            this.tabPane.getTabs().add(index, new Tab(file.getName(), this.folderTab(f)));
+            this.tabPane.getSelectionModel().select(index);
+        } else {
+            try {
+                Desktop.getDesktop().open(file);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            this.refresh(false);
+        }
     }
     private ImageView iconToImageView(File file) {
         ImageView icon;
