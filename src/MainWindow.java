@@ -216,9 +216,14 @@ public class MainWindow extends Application {
         if (file.isDirectory()) {
             if (file.listFiles() != null) {
                 for (File f : Objects.requireNonNull(file.listFiles())) {
-                    if (!f.isHidden()) {
+                    if (this.ml.isShowHidden()) {
                         fileFP.getChildren().add(this.fileUI(this.ml.isListView(), f, f.getName()));
                         count++;
+                    } else {
+                        if (!f.isHidden()) {
+                            fileFP.getChildren().add(this.fileUI(this.ml.isListView(), f, f.getName()));
+                            count++;
+                        }
                     }
                 }
             }
@@ -256,11 +261,10 @@ public class MainWindow extends Application {
 
         Label extensionLabel = new Label("Show file extensions: ");
         VBox extensionBox = setSettingsRadioButtons(extensionLabel, 0);
-        extensionBox.setDisable(true);
+        //extensionBox.setDisable(true);
 
         Label hiddenLabel = new Label("Show hidden files: ");
         VBox hiddenBox = setSettingsRadioButtons(hiddenLabel, 1);
-        hiddenBox.setDisable(true);
 
         Label doubleClickLabel = new Label("Use double click: ");
         VBox doubleClickBox = setSettingsRadioButtons(doubleClickLabel, 2);
@@ -304,8 +308,30 @@ public class MainWindow extends Application {
         RadioButton yes = new RadioButton("Yes");
         RadioButton no = new RadioButton("No");
         switch (submenu) {
-            case 0 -> yes.setSelected(true);
-            case 1 -> no.setSelected(true);
+            case 0 -> {
+                yes.setSelected(this.ml.isShowExtensions());
+                yes.selectedProperty().addListener(e -> {
+                    this.ml.setShowExtensions(true);
+                    refresh(true);
+                });
+                no.setSelected(!this.ml.isShowExtensions());
+                no.selectedProperty().addListener(e -> {
+                    this.ml.setShowExtensions(false);
+                    refresh(true);
+                });
+            }
+            case 1 -> {
+                yes.setSelected(this.ml.isShowHidden());
+                yes.selectedProperty().addListener(e -> {
+                    this.ml.setShowHidden(true);
+                    refresh(true);
+                });
+                no.setSelected(!this.ml.isShowHidden());
+                no.selectedProperty().addListener(e -> {
+                    this.ml.setShowHidden(false);
+                    refresh(true);
+                });
+            }
             case 2 -> {
                 yes.setSelected(this.ml.isDoubleClick());
                 yes.selectedProperty().addListener(e -> this.ml.setDoubleClick(true));
@@ -531,6 +557,12 @@ public class MainWindow extends Application {
             } else {
                 icon = iconToImageView(file);
             }
+
+            if (!this.ml.isShowExtensions() && !file.isDirectory()) {
+                int i = name.lastIndexOf(".");
+                name = name.substring(0, i);
+            }
+
             Label fileName = new Label(name);
             fileName.setMinWidth(500);
             nameBox.getChildren().addAll(icon, fileName);

@@ -10,6 +10,8 @@ public class MainLogic {
     private boolean listView = true;
     private boolean openOnSame = true;
     private boolean doubleClick = true;
+    private boolean showHidden = false;
+    private boolean showExtensions = false;
 
     public MainLogic() {
         this.disks = new ArrayList<>();
@@ -65,5 +67,19 @@ public class MainLogic {
     }
     public void setDoubleClick(boolean doubleClick) {
         this.doubleClick = doubleClick;
+    }
+
+    public boolean isShowHidden() {
+        return showHidden;
+    }
+    public void setShowHidden(boolean showHidden) {
+        this.showHidden = showHidden;
+    }
+
+    public boolean isShowExtensions() {
+        return showExtensions;
+    }
+    public void setShowExtensions(boolean showExtensions) {
+        this.showExtensions = showExtensions;
     }
 }
