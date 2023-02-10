@@ -324,7 +324,6 @@ public class MainWindow extends Application {
 
         return tabBox;
     }
-
     private VBox setSettingsRadioButtons(Label label, int submenu) {
         label.getStyleClass().add("settings-label");
         RadioButton yes = new RadioButton("Yes");
@@ -584,27 +583,6 @@ public class MainWindow extends Application {
 
         return new HBox(fileSP);
     }
-
-    private void setControlButtonActions(File file, HBox fileUI, Button control) {
-        control.setOnMouseEntered(e -> fileUI.setStyle("-fx-background-color: default-color"));
-        control.setOnMouseExited(e -> fileUI.setStyle("-fx-background-color: elevated-background-color"));
-
-        control.setOnAction(e -> {
-            if (!this.ml.isDoubleClick()) {
-                clickOnFile(file);
-            } else {
-                fileUI.setStyle("-fx-background-color: selected-color");
-            }
-        });
-        control.setOnMouseClicked(e -> {
-            if(e.getButton().equals(MouseButton.PRIMARY)){
-                if(e.getClickCount() == 2){
-                    clickOnFile(file);
-                }
-            }
-        });
-    }
-
     private HBox fileUI(boolean list, File file, String name) {
         HBox fileBox = new HBox();
         BasicFileAttributes attr;
@@ -674,6 +652,25 @@ public class MainWindow extends Application {
         return fileBox;
     }
 
+    private void setControlButtonActions(File file, HBox fileUI, Button control) {
+        control.setOnMouseEntered(e -> fileUI.setStyle("-fx-background-color: default-color"));
+        control.setOnMouseExited(e -> fileUI.setStyle("-fx-background-color: elevated-background-color"));
+
+        control.setOnAction(e -> {
+            if (!this.ml.isDoubleClick()) {
+                clickOnFile(file);
+            } else {
+                fileUI.setStyle("-fx-background-color: selected-color");
+            }
+        });
+        control.setOnMouseClicked(e -> {
+            if(e.getButton().equals(MouseButton.PRIMARY)){
+                if(e.getClickCount() == 2){
+                    clickOnFile(file);
+                }
+            }
+        });
+    }
     private void setupControlButtonFile(Button control, HBox fileBox, File file) {
         if (file.isDirectory()) {
             control.setContextMenu(this.setRightClickMenu(0, file));

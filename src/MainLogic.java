@@ -112,6 +112,23 @@ public class MainLogic {
         this.showExtensions = showExtensions;
     }
 
+    public String getTheme() {
+        return theme;
+    }
+    public void setTheme(String theme) {
+        this.theme = theme;
+    }
+    public void changeTheme(String theme) {
+        this.mw.changeTheme(theme);
+    }
+
+    public Tab getSettingsTab() {
+        return settingsTab;
+    }
+    public void setSettingsTab(Tab settingsTab) {
+        this.settingsTab = settingsTab;
+    }
+
     public void writeTheme(String theme) {
         this.replaceValueInConfig(this.theme, theme);
     }
@@ -175,24 +192,6 @@ public class MainLogic {
         }
         this.replaceValueInConfig(s, s1);
     }
-
-    public String getTheme() {
-        return theme;
-    }
-    public void setTheme(String theme) {
-        this.theme = theme;
-    }
-    public void changeTheme(String theme) {
-        this.mw.changeTheme(theme);
-    }
-
-    public Tab getSettingsTab() {
-        return settingsTab;
-    }
-    public void setSettingsTab(Tab settingsTab) {
-        this.settingsTab = settingsTab;
-    }
-
     private void replaceValueInConfig(String oldValue, String newValue) {
         File config = new File(Loader.PATH_TO_CONFIG + "/config.cf");
         String s;

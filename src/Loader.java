@@ -65,7 +65,6 @@ public class Loader {
             throw new RuntimeException(e);
         }
     }
-
     private void notExisting(File folder) {
         File config = new File(folder.getPath() + "/config.cf");
         if (!config.exists()) {
