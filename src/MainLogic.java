@@ -8,6 +8,7 @@ public class MainLogic {
     private final MainWindow mw;
 
     private final ArrayList<DiskClass> disks;
+    private final ArrayList<File> pinnedFiles;
     private File activeFile = null;
     private boolean listView = true;
     private boolean openOnSame = true;
@@ -20,7 +21,30 @@ public class MainLogic {
     public MainLogic(MainWindow mw) {
         this.mw = mw;
         this.disks = new ArrayList<>();
+        this.pinnedFiles = new ArrayList<>();
         this.loadDrives();
+    }
+
+    public void addPinned(File file) {
+        this.pinnedFiles.add(file);
+    }
+    public void removePinned(File file) {
+        this.pinnedFiles.remove(file);
+    }
+    public ArrayList<File> getPinnedFiles() {
+        return this.pinnedFiles;
+    }
+    public void savePinned() {
+        try {
+            PrintWriter pw = new PrintWriter(Loader.PATH_TO_CONFIG + "/pinned.txt");
+            for (File f : this.pinnedFiles) {
+                pw.print(f.getAbsolutePath() + ";");
+            }
+            pw.flush();
+            pw.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void loadDrives() {

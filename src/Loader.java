@@ -37,11 +37,10 @@ public class Loader {
     private void existing(File folder) {
         this.notExisting(folder);
         File config = new File(folder.getPath() + "/config.cf");
-        BufferedReader br;
-        String line;
+
         try {
-            br = new BufferedReader(new FileReader(config));
-            line = br.readLine();
+            BufferedReader br = new BufferedReader(new FileReader(config));
+            String line = br.readLine();
             String[][] splitConfig = this.splitString(line);
             for (String[] s : splitConfig) {
                 this.configSettings(s);
@@ -51,7 +50,20 @@ public class Loader {
             throw new RuntimeException(e);
         }
 
-        //File pinned = new File(folder.getPath() + "/pinned.txt");
+        File pinned = new File(folder.getPath() + "/pinned.txt");
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(pinned));
+            String line = br.readLine();
+            br.close();
+            if (line != null) {
+                String[] paths = line.split(";");
+                for (String s : paths) {
+                    this.ml.addPinned(new File(s));
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void notExisting(File folder) {

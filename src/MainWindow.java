@@ -35,7 +35,6 @@ public class MainWindow extends Application {
     private MainLogic ml;
     private Scene mainScene;
     private final TabPane tabPane = new TabPane();
-    private BorderPane pinnedBP;
 
     public static void main(String[] args) {
         launch();
@@ -52,6 +51,7 @@ public class MainWindow extends Application {
         stage.setScene(mainScene);
         stage.setTitle("File explorer");
         stage.setResizable(false);
+        stage.setOnCloseRequest(e -> this.ml.savePinned());
 
         icons.setOnAction(iconEvent -> getHostServices().showDocument("https://www.flaticon.com/authors/wahyu-adam"));
         icons.getStyleClass().add("label");
@@ -66,6 +66,7 @@ public class MainWindow extends Application {
         this.tabPage();
         bp.setCenter(this.tabPane);
         new Loader(this.ml);
+        this.refresh(true);
         stage.show();
     }
 
@@ -94,7 +95,7 @@ public class MainWindow extends Application {
                     t.setContent(this.homeTab());
                 } else if (t.getText().equals("Settings")) {
                     t.setContent(this.settingsTab());
-                } else {
+                } else if (!t.getText().equals("Add")) {
                     t.setContent(this.folderTab(this.ml.getActiveFile()));
                 }
             }
@@ -112,8 +113,8 @@ public class MainWindow extends Application {
         Button desktop = new Button("Desktop");
         desktop.getStyleClass().add("side-button");
         desktop.setOnAction(e -> {
-            FileSystemView filesys = FileSystemView.getFileSystemView();
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab("Desktop", this.folderTab(new File(filesys.getHomeDirectory().toURI()))));
+            FileSystemView fsv = FileSystemView.getFileSystemView();
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab("Desktop", this.folderTab(new File(fsv.getHomeDirectory().toURI()))));
             this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
         });
 
@@ -177,10 +178,14 @@ public class MainWindow extends Application {
         BorderPane homeBP = new BorderPane();
         Accordion homeAccordion = new Accordion();
 
-        pinnedBP = new BorderPane();
+        BorderPane pinnedBP = new BorderPane();
         pinnedBP.getStyleClass().add("home-border-pane");
         FlowPane pinnedFP = new FlowPane();
-        pinnedFP.getChildren().add(this.pinnedUI("TestPinned"));
+
+        for (File f : this.ml.getPinnedFiles()) {
+            pinnedFP.getChildren().add(this.pinnedUI(f.getName(), f));
+        }
+
         pinnedFP.setPadding(new Insets(20));
         pinnedFP.setHgap(20);
         pinnedFP.setVgap(20);
@@ -211,7 +216,7 @@ public class MainWindow extends Application {
         BorderPane folderBP = new BorderPane();
         folderBP.getStyleClass().add("home-border-pane");
         ScrollPane folderSP = new ScrollPane();
-        folderSP.setContextMenu(this.setRightClickMenu(2));
+        folderSP.setContextMenu(this.setRightClickMenu(2, null));
         folderSP.setOnMouseEntered(e ->folderSP.lookup(".scroll-bar").setStyle("bar-width: bar-fat; bar-height: bar-fat"));
         folderSP.setOnMouseExited(e -> folderSP.lookup(".scroll-bar").setStyle("bar-width: bar-skinny; bar-height: bar-skinny"));
         FlowPane fileFP = new FlowPane();
@@ -478,12 +483,13 @@ public class MainWindow extends Application {
         topBar.getStyleClass().add("hbox-bar");
         return topBar;
     }
-    private ContextMenu setRightClickMenu(int onFile) {
+    private ContextMenu setRightClickMenu(int onFile, File file) {
         ContextMenu menu = new ContextMenu();
         switch (onFile) {
             case 0 -> {
                 MenuItem properties = new MenuItem("Properties");
                 MenuItem pin = new MenuItem("Pin this");
+                pin.setOnAction(e -> this.ml.addPinned(file));
                 MenuItem pathItem = new MenuItem("Copy path");
                 MenuItem cut = new MenuItem("Cut");
                 MenuItem copy = new MenuItem("Copy");
@@ -495,6 +501,7 @@ public class MainWindow extends Application {
             case 1 -> {
                 MenuItem properties1 = new MenuItem("Properties");
                 MenuItem unpin = new MenuItem("Unpin this");
+                unpin.setOnAction(e -> this.ml.removePinned(file));
                 MenuItem pathItem1 = new MenuItem("Copy path");
                 MenuItem copy1 = new MenuItem("Copy");
                 MenuItem delete1 = new MenuItem("Delete");
@@ -556,7 +563,7 @@ public class MainWindow extends Application {
 
         return new HBox(diskSP);
     }
-    private HBox pinnedUI(String name) {
+    private HBox pinnedUI(String name, File file) {
         ImageView icon = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/folder.png")).toExternalForm()));
         icon.setFitHeight(50);
         icon.setFitWidth(50);
@@ -570,13 +577,34 @@ public class MainWindow extends Application {
         fileUI.setPadding(new Insets(10));
         Button control = new Button();
         control.getStyleClass().add("pinned-control-right");
-        control.setContextMenu(this.setRightClickMenu(1));
-        control.setOnMouseEntered(e -> fileUI.setStyle("-fx-background-color: default-color"));
-        control.setOnMouseExited(e -> fileUI.setStyle("-fx-background-color: elevated-background-color"));
+        control.setContextMenu(this.setRightClickMenu(1, file));
+        setControlButtonActions(file, fileUI, control);
+
         StackPane fileSP = new StackPane(fileUI, control);
 
         return new HBox(fileSP);
     }
+
+    private void setControlButtonActions(File file, HBox fileUI, Button control) {
+        control.setOnMouseEntered(e -> fileUI.setStyle("-fx-background-color: default-color"));
+        control.setOnMouseExited(e -> fileUI.setStyle("-fx-background-color: elevated-background-color"));
+
+        control.setOnAction(e -> {
+            if (!this.ml.isDoubleClick()) {
+                clickOnFile(file);
+            } else {
+                fileUI.setStyle("-fx-background-color: selected-color");
+            }
+        });
+        control.setOnMouseClicked(e -> {
+            if(e.getButton().equals(MouseButton.PRIMARY)){
+                if(e.getClickCount() == 2){
+                    clickOnFile(file);
+                }
+            }
+        });
+    }
+
     private HBox fileUI(boolean list, File file, String name) {
         HBox fileBox = new HBox();
         BasicFileAttributes attr;
@@ -648,27 +676,11 @@ public class MainWindow extends Application {
 
     private void setupControlButtonFile(Button control, HBox fileBox, File file) {
         if (file.isDirectory()) {
-            control.setContextMenu(this.setRightClickMenu(0));
+            control.setContextMenu(this.setRightClickMenu(0, file));
         } else {
-            control.setContextMenu(this.setRightClickMenu(3));
+            control.setContextMenu(this.setRightClickMenu(3, file));
         }
-        control.setOnMouseEntered(e -> fileBox.setStyle("-fx-background-color: default-color"));
-        control.setOnMouseExited(e -> fileBox.setStyle("-fx-background-color: elevated-background-color"));
-
-        control.setOnAction(e -> {
-            if (!this.ml.isDoubleClick()) {
-                clickOnFile(file);
-            } else {
-                fileBox.setStyle("-fx-background-color: selected-color");
-            }
-        });
-        control.setOnMouseClicked(e -> {
-            if(e.getButton().equals(MouseButton.PRIMARY)){
-                if(e.getClickCount() == 2){
-                    clickOnFile(file);
-                }
-            }
-        });
+        setControlButtonActions(file, fileBox, control);
     }
     private void clickOnFile(File file) {
         if (file.isDirectory()) {
