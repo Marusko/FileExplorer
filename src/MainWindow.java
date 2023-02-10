@@ -65,7 +65,7 @@ public class MainWindow extends Application {
 
         this.tabPage();
         bp.setCenter(this.tabPane);
-        Loader l = new Loader(this.ml);
+        new Loader(this.ml);
         stage.show();
     }
 
@@ -504,6 +504,16 @@ public class MainWindow extends Application {
                 MenuItem paste = new MenuItem("Paste");
                 menu.getItems().add(paste);
             }
+            case 3 -> {
+                MenuItem properties = new MenuItem("Properties");
+                MenuItem pathItem = new MenuItem("Copy path");
+                MenuItem cut = new MenuItem("Cut");
+                MenuItem copy = new MenuItem("Copy");
+                MenuItem delete = new MenuItem("Delete");
+                MenuItem select = new MenuItem("Select");
+                select.setDisable(true);
+                menu.getItems().addAll(select, copy, cut, delete, pathItem, properties);
+            }
         }
         return menu;
     }
@@ -637,7 +647,11 @@ public class MainWindow extends Application {
     }
 
     private void setupControlButtonFile(Button control, HBox fileBox, File file) {
-        control.setContextMenu(this.setRightClickMenu(0));
+        if (file.isDirectory()) {
+            control.setContextMenu(this.setRightClickMenu(0));
+        } else {
+            control.setContextMenu(this.setRightClickMenu(3));
+        }
         control.setOnMouseEntered(e -> fileBox.setStyle("-fx-background-color: default-color"));
         control.setOnMouseExited(e -> fileBox.setStyle("-fx-background-color: elevated-background-color"));
 
