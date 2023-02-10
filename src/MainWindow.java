@@ -43,8 +43,7 @@ public class MainWindow extends Application {
 
     @Override
     public void start(Stage stage){
-        this.ml = new MainLogic();
-
+        this.ml = new MainLogic(this);
         BorderPane bp = new BorderPane();
         bp.setLeft(this.sidePage());
 
@@ -66,16 +65,21 @@ public class MainWindow extends Application {
 
         this.tabPage();
         bp.setCenter(this.tabPane);
+        Loader l = new Loader(this.ml);
         stage.show();
     }
 
-    private void changeTheme(String theme) {
+    public void changeTheme(String theme) {
         switch (theme) {
             case "Dark" -> {
+                this.ml.writeTheme("Dark");
+                this.ml.setTheme("Dark");
                 mainScene.getStylesheets().clear();
                 mainScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles/darkTheme.css")).toExternalForm());
             }
             case "Light" -> {
+                this.ml.writeTheme("Light");
+                this.ml.setTheme("Light");
                 mainScene.getStylesheets().clear();
                 mainScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles/lightTheme.css")).toExternalForm());
             }
@@ -252,7 +256,7 @@ public class MainWindow extends Application {
         themeLabel.getStyleClass().add("settings-label");
         ComboBox<String> themeChooser = new ComboBox<>();
         themeChooser.getItems().addAll("Dark", "Light");
-        themeChooser.getSelectionModel().select(0);
+        themeChooser.getSelectionModel().select(this.ml.getTheme());
         themeChooser.setOnMouseEntered(e -> themeChooser.setStyle("combo-color: default-color"));
         themeChooser.setOnMouseExited(e -> themeChooser.setStyle("combo-color: elevated-background-color"));
         themeChooser.valueProperty().addListener(e -> this.changeTheme(themeChooser.getValue()));
@@ -271,9 +275,15 @@ public class MainWindow extends Application {
         Label whereLabel = new Label("Where to open folders: ");
         whereLabel.getStyleClass().add("settings-label");
         RadioButton sameTabButton = new RadioButton("Same tab");
-        sameTabButton.selectedProperty().addListener(e -> this.ml.setOpenOnSame(true));
+        sameTabButton.selectedProperty().addListener(e -> {
+            this.ml.writeOnSame(true);
+            this.ml.setOpenOnSame(true);
+        });
         RadioButton newTabButton = new RadioButton("New tab");
-        newTabButton.selectedProperty().addListener(e -> this.ml.setOpenOnSame(false));
+        newTabButton.selectedProperty().addListener(e -> {
+            this.ml.writeOnSame(false);
+            this.ml.setOpenOnSame(false);
+        });
         sameTabButton.setSelected(this.ml.isOpenOnSame());
         newTabButton.setSelected(!this.ml.isOpenOnSame());
         ToggleGroup toggleWhere = new ToggleGroup();
@@ -318,11 +328,13 @@ public class MainWindow extends Application {
             case 0 -> {
                 yes.setSelected(this.ml.isShowExtensions());
                 yes.selectedProperty().addListener(e -> {
+                    this.ml.writeExtensions(true);
                     this.ml.setShowExtensions(true);
                     refresh(true);
                 });
                 no.setSelected(!this.ml.isShowExtensions());
                 no.selectedProperty().addListener(e -> {
+                    this.ml.writeExtensions(false);
                     this.ml.setShowExtensions(false);
                     refresh(true);
                 });
@@ -330,20 +342,28 @@ public class MainWindow extends Application {
             case 1 -> {
                 yes.setSelected(this.ml.isShowHidden());
                 yes.selectedProperty().addListener(e -> {
+                    this.ml.writeHidden(true);
                     this.ml.setShowHidden(true);
                     refresh(true);
                 });
                 no.setSelected(!this.ml.isShowHidden());
                 no.selectedProperty().addListener(e -> {
+                    this.ml.writeHidden(false);
                     this.ml.setShowHidden(false);
                     refresh(true);
                 });
             }
             case 2 -> {
                 yes.setSelected(this.ml.isDoubleClick());
-                yes.selectedProperty().addListener(e -> this.ml.setDoubleClick(true));
+                yes.selectedProperty().addListener(e -> {
+                    this.ml.writeDoubleClick(true);
+                    this.ml.setDoubleClick(true);
+                });
                 no.setSelected(!this.ml.isDoubleClick());
-                no.selectedProperty().addListener(e -> this.ml.setDoubleClick(false));
+                no.selectedProperty().addListener(e -> {
+                    this.ml.writeDoubleClick(false);
+                    this.ml.setDoubleClick(false);
+                });
             }
         }
 
