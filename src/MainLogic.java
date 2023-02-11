@@ -1,11 +1,16 @@
 import javafx.scene.control.Tab;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
 
 import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainLogic {
     private final MainWindow mw;
+    private final Clipboard clipboard;
 
     private final ArrayList<DiskClass> disks;
     private final ArrayList<File> pinnedFiles;
@@ -17,8 +22,10 @@ public class MainLogic {
     private boolean showExtensions = false;
     private String theme = "";
     private Tab settingsTab = null;
+    private boolean cutting = false;
 
     public MainLogic(MainWindow mw) {
+        this.clipboard = Clipboard.getSystemClipboard();
         this.mw = mw;
         this.disks = new ArrayList<>();
         this.pinnedFiles = new ArrayList<>();
@@ -208,6 +215,61 @@ public class MainLogic {
             pw.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void copyPath(File file) {
+        if (file != null) {
+            ClipboardContent content = new ClipboardContent();
+            content.putString(file.getPath());
+            this.clipboard.setContent(content);
+        }
+    }
+    public void copy(File file) {
+        if (file != null) {
+            ClipboardContent content = new ClipboardContent();
+            List<File> files = new ArrayList<>();
+            files.add(file);
+            content.putFiles(files);
+            this.clipboard.setContent(content);
+            this.cutting = false;
+        }
+    }
+    public void cut(File file) {
+        if (file != null && !file.isDirectory()) {
+            ClipboardContent content = new ClipboardContent();
+            List<File> files = new ArrayList<>();
+            files.add(file);
+            content.putFiles(files);
+            this.clipboard.setContent(content);
+            this.cutting = true;
+        }
+    }
+    public void paste(File file) {
+        if (this.clipboard.hasContent(DataFormat.FILES)) {
+            File f = this.clipboard.getFiles().get(0);
+            File f1 = new File(file.getPath() + "\\" + f.getName());
+            try {
+                if (cutting) {
+                    if (f.isDirectory()) {
+                        //cut and paste directory is not working
+                    } else {
+                        Files.copy(f.toPath(), f1.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        f.delete();
+                        this.mw.refresh(true);
+                    }
+                    this.cutting = false;
+                } else {
+                    if (f.isDirectory()) {
+                        //copy and paste directory is not working
+                    } else {
+                        Files.copy(f.toPath(), f1.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        this.mw.refresh(true);
+                    }
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

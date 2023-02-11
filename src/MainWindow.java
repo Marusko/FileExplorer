@@ -86,7 +86,7 @@ public class MainWindow extends Application {
             }
         }
     }
-    private void refresh(boolean all) {
+    public void refresh(boolean all) {
         if (all) {
             for (Tab t : tabPane.getTabs()) {
                 t.setContent(null);
@@ -216,7 +216,7 @@ public class MainWindow extends Application {
         BorderPane folderBP = new BorderPane();
         folderBP.getStyleClass().add("home-border-pane");
         ScrollPane folderSP = new ScrollPane();
-        folderSP.setContextMenu(this.setRightClickMenu(2, null));
+        folderSP.setContextMenu(this.setRightClickMenu(2, file));
         folderSP.setOnMouseEntered(e ->folderSP.lookup(".scroll-bar").setStyle("bar-width: bar-fat; bar-height: bar-fat"));
         folderSP.setOnMouseExited(e -> folderSP.lookup(".scroll-bar").setStyle("bar-width: bar-skinny; bar-height: bar-skinny"));
         FlowPane fileFP = new FlowPane();
@@ -447,9 +447,13 @@ public class MainWindow extends Application {
         more.setGraphic(iconM);
 
         MenuItem copy = new MenuItem("Copy");
+        copy.setDisable(true);
         MenuItem cut = new MenuItem("Cut");
+        cut.setDisable(true);
         MenuItem paste = new MenuItem("Paste");
+
         MenuItem delete = new MenuItem("Delete");
+        delete.setDisable(true);
         MenuItem settings = new MenuItem("Settings");
         settings.setOnAction(e -> {
             if (this.ml.getSettingsTab() == null) {
@@ -463,6 +467,7 @@ public class MainWindow extends Application {
             }
         });
         MenuItem rename = new MenuItem("Rename");
+        rename.setDisable(true);
         MenuItem newMenuItem = new MenuItem("New folder");
         MenuItem order = new MenuItem("Order");
         order.setDisable(true);
@@ -480,45 +485,79 @@ public class MainWindow extends Application {
         topBar.setSpacing(200);
         topBar.setPadding(new Insets(2));
         topBar.getStyleClass().add("hbox-bar");
+
+        paste.setOnAction(e -> this.ml.paste(new File(address.getText())));
+        newMenuItem.setOnAction(e -> new File(address.getText() + "\\test").mkdir());
+
         return topBar;
     }
     private ContextMenu setRightClickMenu(int onFile, File file) {
         ContextMenu menu = new ContextMenu();
         switch (onFile) {
             case 0 -> {
-                MenuItem properties = new MenuItem("Properties");
                 MenuItem pin = new MenuItem("Pin this");
                 pin.setOnAction(e -> this.ml.addPinned(file));
+
                 MenuItem pathItem = new MenuItem("Copy path");
+                pathItem.setOnAction(e -> this.ml.copyPath(file));
+
                 MenuItem cut = new MenuItem("Cut");
+                cut.setOnAction(e -> this.ml.cut(file));
+                cut.setDisable(true);
+
                 MenuItem copy = new MenuItem("Copy");
+                copy.setOnAction(e -> this.ml.copy(file));
+                copy.setDisable(true);
+
                 MenuItem delete = new MenuItem("Delete");
+                delete.setOnAction(e -> file.delete());
+
                 MenuItem select = new MenuItem("Select");
                 select.setDisable(true);
-                menu.getItems().addAll(select, copy, cut, delete, pin, pathItem, properties);
+
+                MenuItem rename = new MenuItem("Rename");
+                rename.setOnAction(e -> file.renameTo(new File(file.getPath() + "_test")));
+
+                menu.getItems().addAll(select, copy, cut, delete, pin, pathItem, rename);
             }
             case 1 -> {
-                MenuItem properties1 = new MenuItem("Properties");
                 MenuItem unpin = new MenuItem("Unpin this");
                 unpin.setOnAction(e -> this.ml.removePinned(file));
+
                 MenuItem pathItem1 = new MenuItem("Copy path");
+                pathItem1.setOnAction(e -> this.ml.copyPath(file));
+
                 MenuItem copy1 = new MenuItem("Copy");
-                MenuItem delete1 = new MenuItem("Delete");
-                menu.getItems().addAll(copy1, delete1, unpin, pathItem1, properties1);
+                copy1.setOnAction(e -> this.ml.copy(file));
+                copy1.setDisable(true);
+
+                menu.getItems().addAll(copy1, unpin, pathItem1);
             }
             case 2 -> {
                 MenuItem paste = new MenuItem("Paste");
+                paste.setOnAction(e -> this.ml.paste(file));
                 menu.getItems().add(paste);
             }
             case 3 -> {
-                MenuItem properties = new MenuItem("Properties");
                 MenuItem pathItem = new MenuItem("Copy path");
+                pathItem.setOnAction(e -> this.ml.copyPath(file));
+
                 MenuItem cut = new MenuItem("Cut");
+                cut.setOnAction(e -> this.ml.cut(file));
+
                 MenuItem copy = new MenuItem("Copy");
+                copy.setOnAction(e -> this.ml.copy(file));
+
                 MenuItem delete = new MenuItem("Delete");
+                delete.setOnAction(e -> file.delete());
+
                 MenuItem select = new MenuItem("Select");
                 select.setDisable(true);
-                menu.getItems().addAll(select, copy, cut, delete, pathItem, properties);
+
+                MenuItem rename = new MenuItem("Rename");
+                rename.setOnAction(e -> file.renameTo(new File(file.getPath() + "_test")));
+
+                menu.getItems().addAll(select, copy, cut, delete, pathItem, rename);
             }
         }
         return menu;
