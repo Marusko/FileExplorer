@@ -69,6 +69,9 @@ public class MainWindow extends Application {
         this.refresh(true);
         stage.show();
     }
+    public Scene getMainScene() {
+        return mainScene;
+    }
 
     public void changeTheme(String theme) {
         switch (theme) {
@@ -207,8 +210,8 @@ public class MainWindow extends Application {
         homeAccordion.setExpandedPane(homeAccordion.getPanes().get(1));
 
         HBox topBar = this.setTopBar();
-        HBox adressBox = (HBox) topBar.getChildren().get(0);
-        Button back = (Button) adressBox.getChildren().get(0);
+        HBox addressBox = (HBox) topBar.getChildren().get(0);
+        Button back = (Button) addressBox.getChildren().get(0);
         back.setDisable(true);
 
         homeBP.setTop(topBar);
@@ -506,7 +509,12 @@ public class MainWindow extends Application {
         });
 
         paste.setOnAction(e -> this.ml.paste(new File(address.getText())));
-        newMenuItem.setOnAction(e -> new File(address.getText() + "\\test").mkdir());
+        newMenuItem.setOnAction(e -> {
+            boolean b = new File(address.getText() + "\\test").mkdir();
+            if (!b) {
+                new WarningWindow("Can't create directory!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
+            }
+        });
 
         return topBar;
     }
@@ -522,20 +530,26 @@ public class MainWindow extends Application {
 
                 MenuItem cut = new MenuItem("Cut");
                 cut.setOnAction(e -> this.ml.cut(file));
-                cut.setDisable(true);
 
                 MenuItem copy = new MenuItem("Copy");
                 copy.setOnAction(e -> this.ml.copy(file));
-                copy.setDisable(true);
 
                 MenuItem delete = new MenuItem("Delete");
-                delete.setOnAction(e -> file.delete());
+                delete.setOnAction(e -> {
+                    if (!file.delete()) {
+                        new WarningWindow("Can't delete directory!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
+                    }
+                });
 
                 MenuItem select = new MenuItem("Select");
                 select.setDisable(true);
 
                 MenuItem rename = new MenuItem("Rename");
-                rename.setOnAction(e -> file.renameTo(new File(file.getPath() + "_test")));
+                rename.setOnAction(e -> {
+                    if (!file.renameTo(new File(file.getPath() + "_test"))) {
+                        new WarningWindow("Can't rename directory!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
+                    }
+                });
 
                 menu.getItems().addAll(select, copy, cut, delete, pin, pathItem, rename);
             }
@@ -548,7 +562,6 @@ public class MainWindow extends Application {
 
                 MenuItem copy1 = new MenuItem("Copy");
                 copy1.setOnAction(e -> this.ml.copy(file));
-                copy1.setDisable(true);
 
                 menu.getItems().addAll(copy1, unpin, pathItem1);
             }
@@ -568,13 +581,21 @@ public class MainWindow extends Application {
                 copy.setOnAction(e -> this.ml.copy(file));
 
                 MenuItem delete = new MenuItem("Delete");
-                delete.setOnAction(e -> file.delete());
+                delete.setOnAction(e -> {
+                    if (!file.delete()) {
+                        new WarningWindow("Can't delete file!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
+                    }
+                });
 
                 MenuItem select = new MenuItem("Select");
                 select.setDisable(true);
 
                 MenuItem rename = new MenuItem("Rename");
-                rename.setOnAction(e -> file.renameTo(new File(file.getPath() + "_test")));
+                rename.setOnAction(e -> {
+                    if (!file.renameTo(new File(file.getPath() + "_test"))) {
+                    new WarningWindow("Can't rename file!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
+                }
+            });
 
                 menu.getItems().addAll(select, copy, cut, delete, pathItem, rename);
             }
@@ -647,6 +668,7 @@ public class MainWindow extends Application {
         try {
             attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
         } catch (IOException e) {
+            new WarningWindow("Can't read attributes!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
             throw new RuntimeException(e);
         }
         fileBox.getStyleClass().add("file-box");
@@ -752,6 +774,7 @@ public class MainWindow extends Application {
             try {
                 Desktop.getDesktop().open(file);
             } catch (IOException ex) {
+                new WarningWindow("Can't open file!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
                 throw new RuntimeException(ex);
             }
             this.refresh(false);

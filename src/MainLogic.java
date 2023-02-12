@@ -52,6 +52,7 @@ public class MainLogic {
             pw.flush();
             pw.close();
         } catch (FileNotFoundException e) {
+            new WarningWindow("Can't find file!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
             throw new RuntimeException(e);
         }
     }
@@ -63,6 +64,7 @@ public class MainLogic {
             try {
                 fileStore = Files.getFileStore(root);
             } catch (IOException e) {
+                new WarningWindow("Can't find root!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
                 throw new RuntimeException(e);
             }
             try {
@@ -71,6 +73,7 @@ public class MainLogic {
                 s = s + fileStore.name();
                 this.disks.add(new DiskClass(s, fileStore.getTotalSpace(), fileStore.getUsableSpace(), fileStore.getAttribute("volume:isRemovable").toString(), root.toString()));
             } catch (IOException e) {
+                new WarningWindow("Can't load disk attributes!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
                 throw new RuntimeException(e);
             }
         }
@@ -226,6 +229,7 @@ public class MainLogic {
             pw.flush();
             pw.close();
         } catch (IOException e) {
+            new WarningWindow("Can't replace value in config!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
             throw new RuntimeException(e);
         }
     }
@@ -248,7 +252,7 @@ public class MainLogic {
         }
     }
     public void cut(File file) {
-        if (file != null && !file.isDirectory()) {
+        if (file != null) {
             ClipboardContent content = new ClipboardContent();
             List<File> files = new ArrayList<>();
             files.add(file);
@@ -264,22 +268,25 @@ public class MainLogic {
             try {
                 if (cutting) {
                     if (f.isDirectory()) {
-                        //cut and paste directory is not working
+                        new WarningWindow("I can't cut directories", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
                     } else {
                         Files.copy(f.toPath(), f1.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        f.delete();
+                        if (!f.delete()) {
+                            new WarningWindow("Can't cut file!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
+                        }
                         this.mw.refresh(true);
                     }
                     this.cutting = false;
                 } else {
                     if (f.isDirectory()) {
-                        //copy and paste directory is not working
+                        new WarningWindow("I can't copy directories", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
                     } else {
                         Files.copy(f.toPath(), f1.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         this.mw.refresh(true);
                     }
                 }
             } catch (IOException e) {
+                new WarningWindow("Can't paste!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
                 throw new RuntimeException(e);
             }
         }
