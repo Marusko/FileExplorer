@@ -230,3 +230,8 @@
 .radio-button .radio .dot{
     -fx-padding: 5px;
 }
+.text-field {
+    -fx-background-color: elevated-background-color;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}

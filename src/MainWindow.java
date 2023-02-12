@@ -510,7 +510,8 @@ public class MainWindow extends Application {
 
         paste.setOnAction(e -> this.ml.paste(new File(address.getText())));
         newMenuItem.setOnAction(e -> {
-            boolean b = new File(address.getText() + "\\test").mkdir();
+            NameWindow nw = new NameWindow("Create new: ", "", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
+            boolean b = new File(address.getText() + "\\" + nw.getName()).mkdir();
             if (!b) {
                 new WarningWindow("Can't create directory!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
             }
@@ -546,7 +547,9 @@ public class MainWindow extends Application {
 
                 MenuItem rename = new MenuItem("Rename");
                 rename.setOnAction(e -> {
-                    if (!file.renameTo(new File(file.getPath() + "_test"))) {
+                    NameWindow nw = new NameWindow("Rename", file.getName(), mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
+                    String newPath = file.getPath().replace(file.getName(), "").replace("\\\\", "\\") + nw.getName();
+                    if (!file.renameTo(new File(newPath))) {
                         new WarningWindow("Can't rename directory!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
                     }
                 });
@@ -592,7 +595,9 @@ public class MainWindow extends Application {
 
                 MenuItem rename = new MenuItem("Rename");
                 rename.setOnAction(e -> {
-                    if (!file.renameTo(new File(file.getPath() + "_test"))) {
+                    NameWindow nw = new NameWindow("Rename", file.getName(), mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
+                    String newPath = file.getPath().replace(file.getName(), "").replace("\\\\", "\\") + nw.getName();
+                    if (!file.renameTo(new File(newPath))) {
                     new WarningWindow("Can't rename file!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
                 }
             });
