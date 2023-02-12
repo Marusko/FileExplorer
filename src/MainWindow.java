@@ -26,7 +26,7 @@ import java.util.Objects;
 
 public class MainWindow extends Application {
     public static final String AUTHOR = "Matúš Suský";
-    public static final String VERSION = "0.0.0.5";
+    public static final String VERSION = "0.1.0";
     private final Hyperlink icons = new Hyperlink("-Icons");
     private final Hyperlink darkThemeC = new Hyperlink("-Dark theme colors");
     private final Hyperlink lightThemeC = new Hyperlink("-Light theme colors");
@@ -61,7 +61,6 @@ public class MainWindow extends Application {
         lightThemeC.getStyleClass().add("label");
         moreLink.setOnAction(iconEvent -> getHostServices().showDocument("https://github.com/Marusko/FileExplorer"));
         moreLink.getStyleClass().add("label");
-        moreLink.setDisable(true);
 
         this.tabPage();
         bp.setCenter(this.tabPane);
