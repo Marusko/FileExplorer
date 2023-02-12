@@ -272,4 +272,10 @@ public class MainLogic {
             }
         }
     }
+
+    public String back(String path) {
+        int index = path.lastIndexOf("\\");
+        path = path.substring(0, index + 1);
+        return path;
+    }
 }

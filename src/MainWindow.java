@@ -206,7 +206,12 @@ public class MainWindow extends Application {
         homeAccordion.getPanes().addAll(pinned, disks);
         homeAccordion.setExpandedPane(homeAccordion.getPanes().get(1));
 
-        homeBP.setTop(this.setTopBar());
+        HBox topBar = this.setTopBar();
+        HBox adressBox = (HBox) topBar.getChildren().get(0);
+        Button back = (Button) adressBox.getChildren().get(0);
+        back.setDisable(true);
+
+        homeBP.setTop(topBar);
         homeBP.setCenter(homeAccordion);
 
         return homeBP;
@@ -244,9 +249,15 @@ public class MainWindow extends Application {
 
         HBox topBar = this.setTopBar();
         HBox addressBox = (HBox) topBar.getChildren().get(0);
-        Label address = (Label) addressBox.getChildren().get(3);
+        Label address = (Label) addressBox.getChildren().get(2);
         address.getStyleClass().add("top-bar-label");
         address.setText(file.getPath());
+
+        Button back = (Button) addressBox.getChildren().get(0);
+        if (address.getText().equals("C:\\")) {
+            back.setDisable(true);
+        }
+
         folderBP.setTop(topBar);
 
         HBox bottomBar = this.setBottomBar();
@@ -424,13 +435,6 @@ public class MainWindow extends Application {
         iconB.setFitHeight(20);
         back.setGraphic(iconB);
 
-        Button forth = new Button();
-        forth.getStyleClass().add("top-bar-button");
-        ImageView iconF = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/next.png")).toExternalForm()));
-        iconF.setFitWidth(20);
-        iconF.setFitHeight(20);
-        forth.setGraphic(iconF);
-
         Button refresh = new Button();
         refresh.getStyleClass().add("top-bar-button");
         ImageView iconR = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/refresh.png")).toExternalForm()));
@@ -445,13 +449,11 @@ public class MainWindow extends Application {
         iconM.setFitWidth(20);
         iconM.setFitHeight(20);
         more.setGraphic(iconM);
-
         MenuItem copy = new MenuItem("Copy");
         copy.setDisable(true);
         MenuItem cut = new MenuItem("Cut");
         cut.setDisable(true);
         MenuItem paste = new MenuItem("Paste");
-
         MenuItem delete = new MenuItem("Delete");
         delete.setDisable(true);
         MenuItem settings = new MenuItem("Settings");
@@ -478,13 +480,29 @@ public class MainWindow extends Application {
         address.getStyleClass().add("top-bar-label");
         HBox moreHBox = new HBox(more);
         moreHBox.setAlignment(Pos.CENTER_RIGHT);
-        HBox addressHBox = new HBox(back, forth, refresh, address);
+        HBox addressHBox = new HBox(back, refresh, address);
         addressHBox.setSpacing(5);
         addressHBox.setAlignment(Pos.CENTER_LEFT);
         HBox topBar = new HBox(addressHBox, moreHBox);
         topBar.setSpacing(200);
         topBar.setPadding(new Insets(2));
         topBar.getStyleClass().add("hbox-bar");
+
+        back.setOnAction(e -> {
+            if (!address.getText().equals("C:\\")) {
+                Tab t = this.tabPane.getSelectionModel().getSelectedItem();
+                t.setContent(null);
+                String backString = this.ml.back(address.getText());
+                File f = new File(backString);
+                t.setContent(this.folderTab(f));
+                t.setText(f.getName());
+                if (backString.equals("C:\\")) {
+                    t.setText("C:\\");
+                }
+            } else {
+                back.setDisable(false);
+            }
+        });
 
         paste.setOnAction(e -> this.ml.paste(new File(address.getText())));
         newMenuItem.setOnAction(e -> new File(address.getText() + "\\test").mkdir());
