@@ -602,6 +602,24 @@ public class MainWindow extends Application {
                 MenuItem select = new MenuItem("Select");
                 select.setDisable(true);
 
+                MenuItem openWith = new MenuItem("Open with");
+                openWith.setOnAction(e -> {
+                    ProcessBuilder builder = new ProcessBuilder("RUNDLL32.EXE", "SHELL32.DLL,OpenAs_RunDLL", file.getAbsolutePath());
+                    if (builder.redirectErrorStream()) {
+                        new WarningWindow("Redirect error stream error!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
+                    }
+                    if (builder.redirectOutput() != ProcessBuilder.Redirect.PIPE) {
+                        new WarningWindow("Redirect output error!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
+                    }
+                    Process process;
+                    try {
+                        process = builder.start();
+                        process.waitFor();
+                    } catch (IOException | InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                });
+
                 MenuItem rename = new MenuItem("Rename");
                 rename.setOnAction(e -> {
                     NameWindow nw = new NameWindow("Rename", file.getName(), mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
@@ -612,7 +630,7 @@ public class MainWindow extends Application {
                 this.refresh(false);
             });
 
-                menu.getItems().addAll(select, copy, cut, delete, pathItem, rename);
+                menu.getItems().addAll(select, copy, cut, delete, pathItem, rename, openWith);
             }
         }
         return menu;
