@@ -6,6 +6,7 @@ import javafx.scene.input.DataFormat;
 import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainLogic {
@@ -14,7 +15,7 @@ public class MainLogic {
 
     private final ArrayList<DiskClass> disks;
     private final ArrayList<File> pinnedFiles;
-    private File activeFile = null;
+    private final HashMap<Tab, File> openedTabs;
     private boolean listView = true;
     private boolean openOnSame = true;
     private boolean doubleClick = true;
@@ -29,6 +30,7 @@ public class MainLogic {
         this.mw = mw;
         this.disks = new ArrayList<>();
         this.pinnedFiles = new ArrayList<>();
+        this.openedTabs = new HashMap<>();
         this.loadDrives();
     }
 
@@ -91,11 +93,21 @@ public class MainLogic {
         this.openOnSame = openOnSame;
     }
 
-    public File getActiveFile() {
-        return activeFile;
+    public void addOpenedTab(Tab tab, File file) {
+        this.openedTabs.put(tab, file);
     }
-    public void setActiveFile(File activeFile) {
-        this.activeFile = activeFile;
+    public void removeOpenedTab(Tab tab) {
+        this.openedTabs.remove(tab);
+    }
+    public File getFileFromTab(Tab tab) {
+        return this.openedTabs.get(tab);
+    }
+    public Tab addFolderTab(String name, String path) {
+        File f = new File(path);
+        Tab t = new Tab(name, this.mw.folderTab(f));
+        this.addOpenedTab(t, f);
+        t.setOnClosed(e -> this.removeOpenedTab(t));
+        return t;
     }
 
     public boolean isDoubleClick() {

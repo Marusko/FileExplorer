@@ -96,13 +96,13 @@ public class MainWindow extends Application {
                 } else if (t.getText().equals("Settings")) {
                     t.setContent(this.settingsTab());
                 } else if (!t.getText().equals("Add")) {
-                    t.setContent(this.folderTab(this.ml.getActiveFile()));
+                    t.setContent(this.folderTab(this.ml.getFileFromTab(t)));
                 }
             }
         } else {
             Tab t = tabPane.getSelectionModel().getSelectedItem();
             t.setContent(null);
-            t.setContent(this.folderTab(this.ml.getActiveFile()));
+            t.setContent(this.folderTab(this.ml.getFileFromTab(t)));
         }
     }
 
@@ -114,42 +114,42 @@ public class MainWindow extends Application {
         desktop.getStyleClass().add("side-button");
         desktop.setOnAction(e -> {
             FileSystemView fsv = FileSystemView.getFileSystemView();
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab("Desktop", this.folderTab(new File(fsv.getHomeDirectory().toURI()))));
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Desktop", fsv.getHomeDirectory().getPath()));
             this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
         });
 
         Button download = new Button("Download");
         download.getStyleClass().add("side-button");
         download.setOnAction(e -> {
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab("Downloads", this.folderTab(new File("C:/Users/" + System.getProperty("user.name") + "/Downloads/"))));
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Downloads", "C:/Users/" + System.getProperty("user.name") + "/Downloads/"));
             this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
         });
 
         Button docs = new Button("Documents");
         docs.getStyleClass().add("side-button");
         docs.setOnAction(e -> {
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab("Documents", this.folderTab(new File("C:/Users/" + System.getProperty("user.name") + "/Documents/"))));
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Documents", "C:/Users/" + System.getProperty("user.name") + "/Documents/"));
             this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
         });
 
         Button pics = new Button("Pictures");
         pics.getStyleClass().add("side-button");
         pics.setOnAction(e -> {
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab("Pictures", this.folderTab(new File("C:/Users/" + System.getProperty("user.name") + "/Pictures/"))));
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Pictures", "C:/Users/" + System.getProperty("user.name") + "/Pictures/"));
             this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
         });
 
         Button music = new Button("Music");
         music.getStyleClass().add("side-button");
         music.setOnAction(e -> {
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab("Music", this.folderTab(new File("C:/Users/" + System.getProperty("user.name") + "/Music/"))));
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Music", "C:/Users/" + System.getProperty("user.name") + "/Music/"));
             this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
         });
 
         Button videos = new Button("Videos");
         videos.getStyleClass().add("side-button");
         videos.setOnAction(e -> {
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab("Videos", this.folderTab(new File("C:/Users/" + System.getProperty("user.name") + "/Videos/"))));
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Videos", "C:/Users/" + System.getProperty("user.name") + "/Videos/"));
             this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
         });
 
@@ -216,8 +216,7 @@ public class MainWindow extends Application {
 
         return homeBP;
     }
-    private BorderPane folderTab(File file) {
-        this.ml.setActiveFile(file);
+    public BorderPane folderTab(File file) {
         BorderPane folderBP = new BorderPane();
         folderBP.getStyleClass().add("home-border-pane");
         ScrollPane folderSP = new ScrollPane();
@@ -492,6 +491,7 @@ public class MainWindow extends Application {
             if (!address.getText().equals("C:\\")) {
                 Tab t = this.tabPane.getSelectionModel().getSelectedItem();
                 t.setContent(null);
+                this.ml.removeOpenedTab(t);
                 String backString = this.ml.back(address.getText());
                 File f = new File(backString);
                 t.setContent(this.folderTab(f));
@@ -499,6 +499,7 @@ public class MainWindow extends Application {
                 if (backString.equals("C:\\")) {
                     t.setText("C:\\");
                 }
+                this.ml.addOpenedTab(t, f);
             } else {
                 back.setDisable(false);
             }
@@ -612,7 +613,7 @@ public class MainWindow extends Application {
                 this.tabPane.getTabs().remove(this.tabPane.getTabs().get(this.tabPane.getSelectionModel().getSelectedIndex()));
             }
             File file = new File(d.getPath());
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, new Tab(d.getName(), this.folderTab(file)));
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab(d.getName(), file.getPath()));
             this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
         });
         StackPane diskSP = new StackPane(diskUI, control);
@@ -741,10 +742,11 @@ public class MainWindow extends Application {
             int index = this.tabPane.getTabs().size() - 1;
             if (this.ml.isOpenOnSame()) {
                 index = this.tabPane.getSelectionModel().getSelectedIndex();
-                this.tabPane.getTabs().remove(this.tabPane.getTabs().get(index));
+                Tab t = this.tabPane.getTabs().get(index);
+                this.ml.removeOpenedTab(t);
+                this.tabPane.getTabs().remove(t);
             }
-            File f = new File(file.getPath());
-            this.tabPane.getTabs().add(index, new Tab(file.getName(), this.folderTab(f)));
+            this.tabPane.getTabs().add(index, this.ml.addFolderTab(file.getName(), file.getPath()));
             this.tabPane.getSelectionModel().select(index);
         } else {
             try {
