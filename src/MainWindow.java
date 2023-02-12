@@ -50,6 +50,7 @@ public class MainWindow extends Application {
         mainScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles/darkTheme.css")).toExternalForm());
         stage.setScene(mainScene);
         stage.setTitle("File explorer");
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/folder_small.png")).toExternalForm()));
         stage.setResizable(false);
         stage.setOnCloseRequest(e -> this.ml.savePinned());
 

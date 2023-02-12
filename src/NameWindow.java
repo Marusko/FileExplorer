@@ -4,8 +4,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.util.Objects;
 
 public class NameWindow {
     private String name;
@@ -21,6 +24,7 @@ public class NameWindow {
     private void setUI(String oldName) {
         Stage s = new Stage();
         s.setTitle(this.action);
+        s.getIcons().add(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/folder_small.png")).toExternalForm()));
         Label messageLabel = new Label(this.action);
         messageLabel.setStyle("-fx-font-size: 15px");
 

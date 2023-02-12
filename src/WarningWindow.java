@@ -3,8 +3,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.util.Objects;
 
 public class WarningWindow {
     private final String message;
@@ -18,6 +21,7 @@ public class WarningWindow {
     private void setUI() {
         Stage s = new Stage();
         s.setTitle("Warning");
+        s.getIcons().add(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/folder_small.png")).toExternalForm()));
         Label messageLabel = new Label(this.message);
         messageLabel.setStyle("-fx-font-size: 15px");
 
