@@ -515,6 +515,7 @@ public class MainWindow extends Application {
             if (!b) {
                 new WarningWindow("Can't create directory!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
             }
+            this.refresh(false);
         });
 
         return topBar;
@@ -524,7 +525,10 @@ public class MainWindow extends Application {
         switch (onFile) {
             case 0 -> {
                 MenuItem pin = new MenuItem("Pin this");
-                pin.setOnAction(e -> this.ml.addPinned(file));
+                pin.setOnAction(e -> {
+                    this.ml.addPinned(file);
+                    this.refresh(true);
+                });
 
                 MenuItem pathItem = new MenuItem("Copy path");
                 pathItem.setOnAction(e -> this.ml.copyPath(file));
@@ -540,6 +544,7 @@ public class MainWindow extends Application {
                     if (!file.delete()) {
                         new WarningWindow("Can't delete directory!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
                     }
+                    this.refresh(false);
                 });
 
                 MenuItem select = new MenuItem("Select");
@@ -552,13 +557,17 @@ public class MainWindow extends Application {
                     if (!file.renameTo(new File(newPath))) {
                         new WarningWindow("Can't rename directory!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
                     }
+                    this.refresh(false);
                 });
 
                 menu.getItems().addAll(select, copy, cut, delete, pin, pathItem, rename);
             }
             case 1 -> {
                 MenuItem unpin = new MenuItem("Unpin this");
-                unpin.setOnAction(e -> this.ml.removePinned(file));
+                unpin.setOnAction(e -> {
+                    this.ml.removePinned(file);
+                    this.refresh(true);
+                });
 
                 MenuItem pathItem1 = new MenuItem("Copy path");
                 pathItem1.setOnAction(e -> this.ml.copyPath(file));
@@ -588,6 +597,7 @@ public class MainWindow extends Application {
                     if (!file.delete()) {
                         new WarningWindow("Can't delete file!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
                     }
+                    this.refresh(false);
                 });
 
                 MenuItem select = new MenuItem("Select");
@@ -600,6 +610,7 @@ public class MainWindow extends Application {
                     if (!file.renameTo(new File(newPath))) {
                     new WarningWindow("Can't rename file!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
                 }
+                this.refresh(false);
             });
 
                 menu.getItems().addAll(select, copy, cut, delete, pathItem, rename);

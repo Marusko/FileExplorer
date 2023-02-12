@@ -282,7 +282,7 @@ public class MainLogic {
                         new WarningWindow("I can't copy directories", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
                     } else {
                         Files.copy(f.toPath(), f1.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        this.mw.refresh(true);
+                        this.mw.refresh(false);
                     }
                 }
             } catch (IOException e) {
