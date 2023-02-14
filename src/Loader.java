@@ -21,14 +21,14 @@ public class Loader {
         if(folder.exists()) {
             this.existing(folder);
         } else {
-            String[][] splitFallBack = this.splitString(Loader.FALL_BACK);
-            for (String[] s : splitFallBack) {
-                this.configSettings(s);
-            }
             if (folder.mkdir()) {
                 this.notExisting(folder);
             } else {
                 throw new IOException("Can't create the directory!");
+            }
+            String[][] splitFallBack = this.splitString(Loader.FALL_BACK);
+            for (String[] s : splitFallBack) {
+                this.configSettings(s);
             }
         }
     }

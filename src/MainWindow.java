@@ -92,7 +92,6 @@ public class MainWindow extends Application {
         }
     }
 
-    //UI--------------------------------------
     private VBox sidePage() {
         VBox side = new VBox();
         side.getStyleClass().add("vbox");
@@ -479,16 +478,16 @@ public class MainWindow extends Application {
                     this.ml.refresh(true);
                 });
 
-                MenuItem pathItem1 = new MenuItem("Copy path");
-                pathItem1.setOnAction(e -> this.ml.copyPath(file));
+                MenuItem pathItem = new MenuItem("Copy path");
+                pathItem.setOnAction(e -> this.ml.copyPath(file));
 
-                MenuItem copy1 = new MenuItem("Copy");
-                copy1.setOnAction(e -> this.ml.copy(file));
+                MenuItem copy = new MenuItem("Copy");
+                copy.setOnAction(e -> this.ml.copy(file));
 
                 MenuItem properties = new MenuItem("Properties");
                 properties.setOnAction(e -> new PropertiesWindow(file, mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1)));
 
-                menu.getItems().addAll(copy1, unpin, pathItem1, properties);
+                menu.getItems().addAll(copy, unpin, pathItem, properties);
             }
             case 2 -> {
                 MenuItem paste = new MenuItem("Paste");
