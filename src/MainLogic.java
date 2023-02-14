@@ -377,9 +377,22 @@ public class MainLogic {
             this.mw.getTabPane().getSelectionModel().select(this.getSettingsTab());
         }
     }
-    protected void newFolder(Label address) {
+    protected void newFile(Label address) {
         NameWindow nw = new NameWindow("Create new: ", "", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
-        boolean b = new File(address.getText() + "\\" + nw.getName()).mkdir();
+        String name = nw.getName();
+        int index = name.lastIndexOf(".");
+        boolean b;
+        if (index == -1) {
+            b = new File(address.getText() + "\\" + name).mkdir();
+        } else {
+            try {
+                b = new File(address.getText() + "\\" + name).createNewFile();
+            } catch (IOException e) {
+                new WarningWindow("Can't create file!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
+                throw new RuntimeException(e);
+            }
+        }
+
         if (!b) {
             new WarningWindow("Can't create directory!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
         }

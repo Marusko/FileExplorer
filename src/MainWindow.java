@@ -428,10 +428,12 @@ public class MainWindow extends Application {
         settings.setOnAction(e -> this.ml.settings());
         MenuItem rename = new MenuItem("Rename");
         rename.setDisable(true);
-        MenuItem newMenuItem = new MenuItem("New folder");
+        MenuItem newMenuItem = new MenuItem("New");
         MenuItem order = new MenuItem("Order");
         order.setDisable(true);
-        more.getItems().addAll(copy, cut, paste, rename, newMenuItem, delete, order, settings);
+        MenuItem search = new MenuItem("Search");
+        search.setDisable(true);
+        more.getItems().addAll(copy, cut, paste, rename, newMenuItem, delete, order, search, settings);
 
         Label address = new Label("");
         address.setMinWidth(600);
@@ -448,7 +450,7 @@ public class MainWindow extends Application {
 
         back.setOnAction(e -> this.ml.back(address, back));
         paste.setOnAction(e -> this.ml.paste(new File(address.getText())));
-        newMenuItem.setOnAction(e -> this.ml.newFolder(address));
+        newMenuItem.setOnAction(e -> this.ml.newFile(address));
 
         return topBar;
     }
