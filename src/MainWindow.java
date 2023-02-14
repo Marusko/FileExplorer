@@ -13,10 +13,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.apache.commons.io.FileUtils;
 
 import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
-import java.awt.*;
+import java.awt.Desktop;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +31,7 @@ public class MainWindow extends Application {
     private final Hyperlink icons = new Hyperlink("-Icons");
     private final Hyperlink darkThemeC = new Hyperlink("-Dark theme colors");
     private final Hyperlink lightThemeC = new Hyperlink("-Light theme colors");
+    private final Hyperlink fileUtilsLink = new Hyperlink("-Library for operations with files");
     private final Hyperlink moreLink = new Hyperlink("Github");
 
     private MainLogic ml;
@@ -62,6 +64,8 @@ public class MainWindow extends Application {
         lightThemeC.getStyleClass().add("label");
         moreLink.setOnAction(iconEvent -> getHostServices().showDocument("https://github.com/Marusko/FileExplorer"));
         moreLink.getStyleClass().add("label");
+        fileUtilsLink.setOnAction(iconEvent -> getHostServices().showDocument("https://commons.apache.org/proper/commons-io/index.html"));
+        fileUtilsLink.getStyleClass().add("label");
 
         this.tabPage();
         bp.setCenter(this.tabPane);
@@ -124,35 +128,35 @@ public class MainWindow extends Application {
         Button download = new Button("Download");
         download.getStyleClass().add("side-button");
         download.setOnAction(e -> {
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Downloads", "C:/Users/" + System.getProperty("user.name") + "/Downloads/"));
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Downloads", FileUtils.getUserDirectoryPath() + "/Downloads/"));
             this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
         });
 
         Button docs = new Button("Documents");
         docs.getStyleClass().add("side-button");
         docs.setOnAction(e -> {
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Documents", "C:/Users/" + System.getProperty("user.name") + "/Documents/"));
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Documents", FileUtils.getUserDirectoryPath() + "/Documents/"));
             this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
         });
 
         Button pics = new Button("Pictures");
         pics.getStyleClass().add("side-button");
         pics.setOnAction(e -> {
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Pictures", "C:/Users/" + System.getProperty("user.name") + "/Pictures/"));
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Pictures", FileUtils.getUserDirectoryPath() + "/Pictures/"));
             this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
         });
 
         Button music = new Button("Music");
         music.getStyleClass().add("side-button");
         music.setOnAction(e -> {
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Music", "C:/Users/" + System.getProperty("user.name") + "/Music/"));
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Music", FileUtils.getUserDirectoryPath() + "/Music/"));
             this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
         });
 
         Button videos = new Button("Videos");
         videos.getStyleClass().add("side-button");
         videos.setOnAction(e -> {
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Videos", "C:/Users/" + System.getProperty("user.name") + "/Videos/"));
+            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Videos", FileUtils.getUserDirectoryPath() + "/Videos/"));
             this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
         });
 
@@ -193,7 +197,7 @@ public class MainWindow extends Application {
         pinnedFP.setHgap(20);
         pinnedFP.setVgap(20);
         pinnedBP.setCenter(pinnedFP);
-        TitledPane pinned = new TitledPane("Pinned  - - - - - - ", pinnedBP);
+        TitledPane pinned = new TitledPane("Pinned", pinnedBP);
 
         BorderPane diskBP = new BorderPane();
         diskBP.getStyleClass().add("home-border-pane");
@@ -205,7 +209,7 @@ public class MainWindow extends Application {
         diskFP.setHgap(20);
         diskFP.setVgap(20);
         diskBP.setCenter(diskFP);
-        TitledPane disks = new TitledPane("Disks  - - - - - - ", diskBP);
+        TitledPane disks = new TitledPane("Disks", diskBP);
         homeAccordion.getPanes().addAll(pinned, disks);
         homeAccordion.setExpandedPane(homeAccordion.getPanes().get(1));
 
@@ -224,7 +228,7 @@ public class MainWindow extends Application {
         folderBP.getStyleClass().add("home-border-pane");
         ScrollPane folderSP = new ScrollPane();
         folderSP.setContextMenu(this.setRightClickMenu(2, file));
-        folderSP.setOnMouseEntered(e ->folderSP.lookup(".scroll-bar").setStyle("bar-width: bar-fat; bar-height: bar-fat"));
+        folderSP.setOnMouseEntered(e -> folderSP.lookup(".scroll-bar").setStyle("bar-width: bar-fat; bar-height: bar-fat"));
         folderSP.setOnMouseExited(e -> folderSP.lookup(".scroll-bar").setStyle("bar-width: bar-skinny; bar-height: bar-skinny"));
         FlowPane fileFP = new FlowPane();
         fileFP.setPrefWidth(950);
@@ -328,7 +332,7 @@ public class MainWindow extends Application {
         Label moreOn = new Label("More on: ");
         HBox moreBox = new HBox(moreOn, moreLink);
         Label copy = new Label("Copyright: ");
-        VBox copyBox = new VBox(copy, icons, darkThemeC, lightThemeC);
+        VBox copyBox = new VBox(copy, icons, darkThemeC, lightThemeC, fileUtilsLink);
         VBox infoBox = new VBox(authorLabel, versionLabel, moreBox, copyBox);
         infoBox.setStyle("-fx-spacing: 10px");
 
@@ -500,7 +504,7 @@ public class MainWindow extends Application {
                 t.setContent(this.folderTab(f));
                 t.setText(f.getName());
                 if (backString.equals("C:\\")) {
-                    t.setText("C:\\");
+                    t.setText("(C:)OS");
                 }
                 this.ml.addOpenedTab(t, f);
             } else {
@@ -541,8 +545,11 @@ public class MainWindow extends Application {
 
                 MenuItem delete = new MenuItem("Delete");
                 delete.setOnAction(e -> {
-                    if (!file.delete()) {
+                    try {
+                        FileUtils.deleteDirectory(file);
+                    } catch (IOException ex) {
                         new WarningWindow("Can't delete directory!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
+                        throw new RuntimeException(ex);
                     }
                     this.refresh(false);
                 });

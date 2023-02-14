@@ -2,6 +2,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.nio.file.*;
@@ -268,22 +269,23 @@ public class MainLogic {
             try {
                 if (cutting) {
                     if (f.isDirectory()) {
-                        new WarningWindow("I can't cut directories", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
+                        FileUtils.copyDirectory(f, f1);
+                        FileUtils.deleteDirectory(f);
                     } else {
-                        Files.copy(f.toPath(), f1.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        FileUtils.copyFile(f, f1);
                         if (!f.delete()) {
                             new WarningWindow("Can't cut file!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
                         }
-                        this.mw.refresh(true);
                     }
                     this.cutting = false;
+                    this.mw.refresh(true);
                 } else {
                     if (f.isDirectory()) {
-                        new WarningWindow("I can't copy directories", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
+                        FileUtils.copyDirectory(f, f1);
                     } else {
-                        Files.copy(f.toPath(), f1.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        this.mw.refresh(false);
+                        FileUtils.copyFile(f, f1);
                     }
+                    this.mw.refresh(false);
                 }
             } catch (IOException e) {
                 new WarningWindow("Can't paste!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));

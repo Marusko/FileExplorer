@@ -25,7 +25,6 @@ public class Loader {
             for (String[] s : splitFallBack) {
                 this.configSettings(s);
             }
-
             if (folder.mkdir()) {
                 this.notExisting(folder);
             } else {
