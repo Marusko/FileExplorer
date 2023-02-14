@@ -470,37 +470,7 @@ public class MainWindow extends Application {
                     this.ml.addPinned(file);
                     this.ml.refresh(true);
                 });
-
-                MenuItem pathItem = new MenuItem("Copy path");
-                pathItem.setOnAction(e -> this.ml.copyPath(file));
-
-                MenuItem cut = new MenuItem("Cut");
-                cut.setOnAction(e -> this.ml.cut(file));
-
-                MenuItem copy = new MenuItem("Copy");
-                copy.setOnAction(e -> this.ml.copy(file));
-
-                MenuItem delete = new MenuItem("Delete");
-                delete.setOnAction(e -> this.ml.delete(file));
-
-                MenuItem select = new MenuItem("Select");
-                select.setOnAction(e -> {
-                    if (!this.ml.getSelectedFiles().containsValue(file)){
-                        this.ml.addSelected(ui, file);
-                        ui.setStyle("-fx-background-color: selected-color");
-                    } else {
-                        this.ml.removeSelected(ui);
-                        ui.setStyle("-fx-background-color: elevated-background-color");
-                    }
-                });
-
-                MenuItem rename = new MenuItem("Rename");
-                rename.setOnAction(e -> this.ml.rename(file));
-
-                MenuItem properties = new MenuItem("Properties");
-                properties.setOnAction(e -> new PropertiesWindow(file, mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1)));
-
-                menu.getItems().addAll(select, copy, cut, delete, pin, pathItem, rename, properties);
+                this.setRightClickItems(menu, file, ui, pin);
             }
             case 1 -> {
                 MenuItem unpin = new MenuItem("Unpin this");
@@ -526,42 +496,44 @@ public class MainWindow extends Application {
                 menu.getItems().add(paste);
             }
             case 3 -> {
-                MenuItem pathItem = new MenuItem("Copy path");
-                pathItem.setOnAction(e -> this.ml.copyPath(file));
-
-                MenuItem cut = new MenuItem("Cut");
-                cut.setOnAction(e -> this.ml.cut(file));
-
-                MenuItem copy = new MenuItem("Copy");
-                copy.setOnAction(e -> this.ml.copy(file));
-
-                MenuItem delete = new MenuItem("Delete");
-                delete.setOnAction(e -> this.ml.delete(file));
-
-                MenuItem select = new MenuItem("Select");
-                select.setOnAction(e -> {
-                    if (!this.ml.getSelectedFiles().containsValue(file)){
-                        this.ml.addSelected(ui, file);
-                        ui.setStyle("-fx-background-color: selected-color");
-                    } else {
-                        this.ml.removeSelected(ui);
-                        ui.setStyle("-fx-background-color: elevated-background-color");
-                    }
-                });
-
                 MenuItem openWith = new MenuItem("Open with");
                 openWith.setOnAction(e -> this.ml.openWith(file));
-
-                MenuItem rename = new MenuItem("Rename");
-                rename.setOnAction(e -> this.ml.rename(file));
-
-                MenuItem properties = new MenuItem("Properties");
-                properties.setOnAction(e -> new PropertiesWindow(file, mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1)));
-
-                menu.getItems().addAll(select, copy, cut, delete, pathItem, rename, openWith, properties);
+                this.setRightClickItems(menu, file, ui, openWith);
             }
         }
         return menu;
+    }
+    private void setRightClickItems(ContextMenu menu, File file, HBox ui, MenuItem different) {
+        MenuItem pathItem = new MenuItem("Copy path");
+        pathItem.setOnAction(e -> this.ml.copyPath(file));
+
+        MenuItem cut = new MenuItem("Cut");
+        cut.setOnAction(e -> this.ml.cut(file));
+
+        MenuItem copy = new MenuItem("Copy");
+        copy.setOnAction(e -> this.ml.copy(file));
+
+        MenuItem delete = new MenuItem("Delete");
+        delete.setOnAction(e -> this.ml.delete(file));
+
+        MenuItem select = new MenuItem("Select");
+        select.setOnAction(e -> {
+            if (!this.ml.getSelectedFiles().containsValue(file)){
+                this.ml.addSelected(ui, file);
+                ui.setStyle("-fx-background-color: selected-color");
+            } else {
+                this.ml.removeSelected(ui);
+                ui.setStyle("-fx-background-color: elevated-background-color");
+            }
+        });
+
+        MenuItem rename = new MenuItem("Rename");
+        rename.setOnAction(e -> this.ml.rename(file));
+
+        MenuItem properties = new MenuItem("Properties");
+        properties.setOnAction(e -> new PropertiesWindow(file, mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1)));
+
+        menu.getItems().addAll(select, copy, cut, delete, pathItem, different, rename, properties);
     }
 
     private HBox diskUI(DiskClass d) {
