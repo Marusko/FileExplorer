@@ -35,7 +35,8 @@ public class PropertiesWindow {
         Label name = new Label(this.getName());
         nameLabel.setStyle("-fx-font-size: 15px; -fx-min-width: 50px");
         name.setStyle("-fx-font-size: 15px; -fx-font-weight: normal");
-        HBox nameBox = new HBox(nameLabel, name);
+        ScrollPane nameSP = new ScrollPane(name);
+        HBox nameBox = new HBox(nameLabel, nameSP);
 
         Label typeLabel = new Label("Type: ");
         Label type = new Label(this.getType());
@@ -80,7 +81,7 @@ public class PropertiesWindow {
         warningBox.setSpacing(20);
         warningBox.setPadding(new Insets(30));
 
-        Scene sc = new Scene(warningBox, 400, 350);
+        Scene sc = new Scene(warningBox, 400, 370);
         sc.getStylesheets().add(this.stylesheet);
         s.setScene(sc);
         s.setResizable(false);
