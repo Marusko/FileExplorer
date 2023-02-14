@@ -189,7 +189,8 @@ public class MainWindow extends Application {
         BorderPane folderBP = new BorderPane();
         folderBP.getStyleClass().add("home-border-pane");
         ScrollPane folderSP = new ScrollPane();
-        folderSP.setContextMenu(this.setRightClickMenu(2, file));
+        folderSP.setContextMenu(this.setRightClickMenu(2, file, null));
+        folderSP.setOnMouseClicked(e -> this.ml.clearSelected());
         folderSP.setOnMouseEntered(e -> folderSP.lookup(".scroll-bar").setStyle("bar-width: bar-fat; bar-height: bar-fat"));
         folderSP.setOnMouseExited(e -> folderSP.lookup(".scroll-bar").setStyle("bar-width: bar-skinny; bar-height: bar-skinny"));
         FlowPane fileFP = new FlowPane();
@@ -418,22 +419,28 @@ public class MainWindow extends Application {
         iconM.setFitHeight(20);
         more.setGraphic(iconM);
         MenuItem copy = new MenuItem("Copy");
-        copy.setDisable(true);
+        copy.setOnAction(e -> this.ml.copy(null));
+
         MenuItem cut = new MenuItem("Cut");
-        cut.setDisable(true);
+        cut.setOnAction(e -> this.ml.cut(null));
+
         MenuItem paste = new MenuItem("Paste");
+
         MenuItem delete = new MenuItem("Delete");
-        delete.setDisable(true);
+        delete.setOnAction(e -> this.ml.delete(null));
+
         MenuItem settings = new MenuItem("Settings");
         settings.setOnAction(e -> this.ml.settings());
-        MenuItem rename = new MenuItem("Rename");
-        rename.setDisable(true);
+
         MenuItem newMenuItem = new MenuItem("New");
+
         MenuItem order = new MenuItem("Order");
         order.setDisable(true);
+
         MenuItem search = new MenuItem("Search");
         search.setDisable(true);
-        more.getItems().addAll(copy, cut, paste, rename, newMenuItem, delete, order, search, settings);
+
+        more.getItems().addAll(copy, cut, paste, newMenuItem, delete, order, search, settings);
 
         Label address = new Label("");
         address.setMinWidth(600);
@@ -454,7 +461,7 @@ public class MainWindow extends Application {
 
         return topBar;
     }
-    protected ContextMenu setRightClickMenu(int onFile, File file) {
+    protected ContextMenu setRightClickMenu(int onFile, File file, HBox ui) {
         ContextMenu menu = new ContextMenu();
         switch (onFile) {
             case 0 -> {
@@ -477,7 +484,15 @@ public class MainWindow extends Application {
                 delete.setOnAction(e -> this.ml.delete(file));
 
                 MenuItem select = new MenuItem("Select");
-                select.setDisable(true);
+                select.setOnAction(e -> {
+                    if (!this.ml.getSelectedFiles().containsValue(file)){
+                        this.ml.addSelected(ui, file);
+                        ui.setStyle("-fx-background-color: selected-color");
+                    } else {
+                        this.ml.removeSelected(ui);
+                        ui.setStyle("-fx-background-color: elevated-background-color");
+                    }
+                });
 
                 MenuItem rename = new MenuItem("Rename");
                 rename.setOnAction(e -> this.ml.rename(file));
@@ -524,7 +539,15 @@ public class MainWindow extends Application {
                 delete.setOnAction(e -> this.ml.delete(file));
 
                 MenuItem select = new MenuItem("Select");
-                select.setDisable(true);
+                select.setOnAction(e -> {
+                    if (!this.ml.getSelectedFiles().containsValue(file)){
+                        this.ml.addSelected(ui, file);
+                        ui.setStyle("-fx-background-color: selected-color");
+                    } else {
+                        this.ml.removeSelected(ui);
+                        ui.setStyle("-fx-background-color: elevated-background-color");
+                    }
+                });
 
                 MenuItem openWith = new MenuItem("Open with");
                 openWith.setOnAction(e -> this.ml.openWith(file));
@@ -593,7 +616,7 @@ public class MainWindow extends Application {
         fileUI.setPadding(new Insets(10));
         Button control = new Button();
         control.getStyleClass().add("pinned-control-right");
-        control.setContextMenu(this.setRightClickMenu(1, file));
+        control.setContextMenu(this.setRightClickMenu(1, file, null));
         this.ml.setControlButtonActions(file, fileUI, control);
 
         StackPane fileSP = new StackPane(fileUI, control);
@@ -666,6 +689,9 @@ public class MainWindow extends Application {
             this.ml.setupControlButtonFile(control, fileBox, file);
             StackPane objectSP = new StackPane(objectBox, control);
             fileBox.getChildren().add(objectSP);
+        }
+        if (this.ml.getSelectedFiles().containsValue(file)) {
+            fileBox.setStyle("-fx-background-color: selected-color");
         }
         return fileBox;
     }

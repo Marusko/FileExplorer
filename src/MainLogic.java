@@ -28,6 +28,7 @@ public class MainLogic {
     private final ArrayList<DiskClass> disks;
     private final ArrayList<File> pinnedFiles;
     private final HashMap<Tab, File> openedTabs;
+    private final HashMap<HBox, File> selectedFiles;
     private boolean listView = true;
     private boolean openOnSame = true;
     private boolean doubleClick = true;
@@ -43,7 +44,24 @@ public class MainLogic {
         this.disks = new ArrayList<>();
         this.pinnedFiles = new ArrayList<>();
         this.openedTabs = new HashMap<>();
+        this.selectedFiles = new HashMap<>();
         this.loadDrives();
+    }
+
+    protected void addSelected(HBox ui, File file) {
+        this.selectedFiles.put(ui, file);
+    }
+    protected void removeSelected(HBox ui){
+        this.selectedFiles.remove(ui);
+    }
+    protected void clearSelected(){
+        for (HBox h : this.selectedFiles.keySet()) {
+            h.setStyle("-fx-background-color: elevated-background-color");
+        }
+        this.selectedFiles.clear();
+    }
+    protected HashMap<HBox, File> getSelectedFiles(){
+        return this.selectedFiles;
     }
 
     protected void addPinned(File file) {
@@ -254,54 +272,57 @@ public class MainLogic {
         }
     }
     protected void copy(File file) {
-        if (file != null) {
-            ClipboardContent content = new ClipboardContent();
-            List<File> files = new ArrayList<>();
-            files.add(file);
-            content.putFiles(files);
-            this.clipboard.setContent(content);
-            this.cutting = false;
-        }
+        this.copyCutInternal(file);
+        this.cutting = false;
     }
     protected void cut(File file) {
+        this.copyCutInternal(file);
+        this.cutting = true;
+    }
+    private void copyCutInternal(File file) {
+        ClipboardContent content = new ClipboardContent();
+        List<File> files;
         if (file != null) {
-            ClipboardContent content = new ClipboardContent();
-            List<File> files = new ArrayList<>();
+            files = new ArrayList<>();
             files.add(file);
-            content.putFiles(files);
-            this.clipboard.setContent(content);
-            this.cutting = true;
+        } else {
+            files = new ArrayList<>(this.selectedFiles.values());
         }
+        content.putFiles(files);
+        this.clipboard.setContent(content);
     }
     protected void paste(File file) {
         if (this.clipboard.hasContent(DataFormat.FILES)) {
-            File f = this.clipboard.getFiles().get(0);
-            File f1 = new File(file.getPath() + "\\" + f.getName());
-            try {
-                if (cutting) {
-                    if (f.isDirectory()) {
-                        FileUtils.copyDirectory(f, f1);
-                        FileUtils.deleteDirectory(f);
-                    } else {
-                        FileUtils.copyFile(f, f1);
-                        if (!f.delete()) {
-                            new WarningWindow("Can't cut file!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
-                        }
-                    }
-                    this.cutting = false;
-                    this.refresh(true);
-                } else {
-                    if (f.isDirectory()) {
-                        FileUtils.copyDirectory(f, f1);
-                    } else {
-                        FileUtils.copyFile(f, f1);
-                    }
-                    this.refresh(false);
-                }
-            } catch (IOException e) {
-                new WarningWindow("Can't paste!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
-                throw new RuntimeException(e);
+            for (File f : this.clipboard.getFiles()) {
+                this.internalPaste(file, f);
             }
+            this.cutting = false;
+            this.refresh(true);
+        }
+    }
+    private void internalPaste(File where, File what) {
+        File f1 = new File(where.getPath() + "\\" + what.getName());
+        try {
+            if (cutting) {
+                if (what.isDirectory()) {
+                    FileUtils.copyDirectory(what, f1);
+                    FileUtils.deleteDirectory(what);
+                } else {
+                    FileUtils.copyFile(what, f1);
+                    if (!what.delete()) {
+                        new WarningWindow("Can't cut file!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
+                    }
+                }
+            } else {
+                if (what.isDirectory()) {
+                    FileUtils.copyDirectory(what, f1);
+                } else {
+                    FileUtils.copyFile(what, f1);
+                }
+            }
+        } catch (IOException e) {
+            new WarningWindow("Can't paste!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
+            throw new RuntimeException(e);
         }
     }
     protected void rename(File file) {
@@ -329,6 +350,16 @@ public class MainLogic {
         }
     }
     protected void delete(File file) {
+        if (file != null) {
+            this.deleteInternal(file);
+        } else {
+            for (File f : this.selectedFiles.values()) {
+                this.deleteInternal(f);
+            }
+        }
+        this.refresh(false);
+    }
+    private void deleteInternal(File file) {
         if (file.isDirectory()) {
             try {
                 FileUtils.deleteDirectory(file);
@@ -341,9 +372,7 @@ public class MainLogic {
                 new WarningWindow("Can't delete file!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
             }
         }
-        this.refresh(false);
     }
-
     private String backPath(String path) {
         int index = path.lastIndexOf("\\");
         path = path.substring(0, index + 1);
@@ -405,6 +434,7 @@ public class MainLogic {
     }
 
     protected void refresh(boolean all) {
+        this.clearSelected();
         if (all) {
             for (Tab t : this.mw.getTabPane().getTabs()) {
                 t.setContent(null);
@@ -425,8 +455,20 @@ public class MainLogic {
     }
 
     protected void setControlButtonActions(File file, HBox fileUI, Button control) {
-        control.setOnMouseEntered(e -> fileUI.setStyle("-fx-background-color: default-color"));
-        control.setOnMouseExited(e -> fileUI.setStyle("-fx-background-color: elevated-background-color"));
+        control.setOnMouseEntered(e -> {
+            if (this.selectedFiles.containsValue(file)) {
+                fileUI.setStyle("-fx-background-color: selected-color");
+            } else {
+                fileUI.setStyle("-fx-background-color: default-color");
+            }
+        });
+        control.setOnMouseExited(e -> {
+            if (this.selectedFiles.containsValue(file)) {
+                fileUI.setStyle("-fx-background-color: selected-color");
+            } else {
+                fileUI.setStyle("-fx-background-color: elevated-background-color");
+            }
+        });
 
         control.setOnAction(e -> {
             if (!this.isDoubleClick()) {
@@ -445,9 +487,9 @@ public class MainLogic {
     }
     protected void setupControlButtonFile(Button control, HBox fileBox, File file) {
         if (file.isDirectory()) {
-            control.setContextMenu(this.mw.setRightClickMenu(0, file));
+            control.setContextMenu(this.mw.setRightClickMenu(0, file, fileBox));
         } else {
-            control.setContextMenu(this.mw.setRightClickMenu(3, file));
+            control.setContextMenu(this.mw.setRightClickMenu(3, file, fileBox));
         }
         setControlButtonActions(file, fileBox, control);
     }
