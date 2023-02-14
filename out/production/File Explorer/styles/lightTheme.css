@@ -1,0 +1,237 @@
+.root{
+    default-color: #9ED5C5;
+    selected-color: #8EC3B0;
+    background-color: #DEF5E5;
+    elevated-background-color: #BCEAD5;
+    text-color: black;
+}
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-opacity: 0;
+}
+.tab-pane {
+    -fx-tab-min-width:90px;
+    -fx-background-color: background-color;
+}
+.tab-pane .tab {
+    -fx-background-color: default-color;
+}
+.tab-pane .tab:selected {
+    -fx-background-color: selected-color;
+}
+.tab .tab-label {
+    -fx-alignment: CENTER;
+    -fx-text-fill: text-color;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.titled-pane {
+    -fx-text-fill: text-color;
+    -fx-font-weight: bold;
+}
+.titled-pane .content {
+    -fx-background-color: background-color;
+    -fx-border-color: background-color;
+}
+.titled-pane .title {
+    -fx-background-color: default-color;
+}
+.titled-pane .title .arrow-button .arrow {
+    -fx-background-color: selected-color;
+}
+.home-border-pane {
+    -fx-background-color: background-color;
+}
+
+.side-button {
+    button-color: default-color;
+    -fx-background-color: button-color;
+    -fx-pref-width: 170px;
+    -fx-pref-height: 30px;
+    -fx-text-fill: text-color;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+.side-button:hover {
+    button-color: selected-color;
+    -fx-background-color: button-color;
+}
+.top-bar-button {
+    button-color: default-color;
+    -fx-background-color: button-color;
+    -fx-pref-height: 30px;
+    -fx-pref-width: 30px;
+    -fx-text-fill: text-color;
+}
+.top-bar-button:hover {
+    button-color: selected-color;
+    -fx-background-color: button-color;
+}
+.context-menu {
+    -fx-background-color: background-color;
+    -fx-background-radius: 4px;
+}
+.menu-button > .arrow-button {
+    -fx-padding: 0;
+}
+.menu-button > .arrow-button > .arrow {
+    -fx-padding: 0;
+}
+.menu-item {
+    -fx-pref-width: 100px;
+    -fx-background-radius: 3px;
+    -fx-background-color: background-color;
+    -fx-padding: 10px;
+}
+.menu-item:hover {
+    -fx-background-color: elevated-background-color;
+}
+.top-bar-label {
+    -fx-text-fill: text-color;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+.bottom-bar-label {
+    -fx-text-fill: text-color;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+.bottom-bar-button {
+    button-color: default-color;
+    -fx-background-color: button-color;
+    -fx-pref-height: 15px;
+    -fx-pref-width: 15px;
+    -fx-text-fill: text-color;
+}
+.bottom-bar-button:hover {
+    button-color: selected-color;
+    -fx-background-color: button-color;
+}
+.label {
+    -fx-text-fill: text-color;
+    -fx-font-weight: bold;
+}
+.hbox-bar {
+    -fx-background-color: elevated-background-color;
+}
+.hbox-disk {
+    -fx-background-color: elevated-background-color;
+    -fx-background-radius: 10px;
+    -fx-pref-width: 250px;
+    -fx-pref-height: 80px;
+}
+.hbox-disk:hover {
+    button-color: default-color;
+    -fx-background-color: button-color;
+}
+.vbox {
+    -fx-background-color: background-color;
+}
+.file-box {
+    -fx-background-color: elevated-background-color;
+    -fx-background-radius: 10px;
+}
+.file-box:hover {
+    button-color: default-color;
+    -fx-background-color: button-color;
+}
+.scroll-pane {
+    -fx-background-color: background-color;
+}
+.scroll-pane .viewport {
+    -fx-background-color: background-color;
+}
+
+.scroll-pane .corner{
+    -fx-background-color: transparent;
+}
+.scroll-bar{
+    bar-skinny: 8px;
+    bar-fat: 12px;
+
+    thumb-color: default-color;
+    bar-width: bar-skinny;
+    bar-height: bar-skinny;
+}
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: bar-width;
+}
+.scroll-bar .thumb{
+    -fx-background-color: thumb-color;
+}
+.scroll-bar .increment-arrow{
+    -fx-background-color: transparent;
+}
+.scroll-bar .decrement-arrow{
+    -fx-background-color: transparent;
+}
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-pref-height: bar-height;
+}
+.scroll-bar .increment-button{
+    -fx-background-color: transparent;
+}
+.scroll-bar .decrement-button{
+    -fx-background-color: transparent;
+}
+
+.pinned-control-right {
+    -fx-pref-width: 250px;
+    -fx-pref-height: 70px;
+    -fx-background-color: transparent;
+}
+.progress-bar{
+    -fx-pref-width: 140px;
+    -fx-pref-height: 15px;
+    -fx-background-color: transparent;
+}
+.progress-bar .track {
+    -fx-background-color: greenyellow;
+}
+.progress-bar .bar{
+    -fx-background-color: selected-color;
+}
+.settings-label{
+    -fx-font-size: 15px;
+    -fx-font-weight: bold
+}
+.combo-box{
+    combo-color: elevated-background-color;
+    -fx-background-color: combo-color;
+    -fx-pref-width: 200px;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold
+}
+.combo-box .cell:selected{
+    -fx-background-color: elevated-background-color;
+    -fx-text-fill: black;
+    -fx-text-background-color: transparent;
+}
+.combo-box .cell:hover{
+    -fx-background-color: default-color;
+    -fx-text-fill: black;
+    -fx-text-background-color: transparent;
+}
+.radio-button {
+    -fx-text-fill: black;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.radio-button .radio{
+    -fx-background-color: elevated-background-color;
+}
+.radio-button .radio:hover{
+    -fx-background-color: default-color;
+}
+.radio-button:selected .radio .dot{
+    -fx-background-color: selected-color;
+}
+.radio-button .radio .dot{
+    -fx-padding: 5px;
+}
+.text-field {
+    -fx-background-color: elevated-background-color;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+}
