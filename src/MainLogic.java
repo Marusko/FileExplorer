@@ -1,9 +1,20 @@
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.HBox;
 import org.apache.commons.io.FileUtils;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
@@ -35,16 +46,16 @@ public class MainLogic {
         this.loadDrives();
     }
 
-    public void addPinned(File file) {
+    protected void addPinned(File file) {
         this.pinnedFiles.add(file);
     }
-    public void removePinned(File file) {
+    protected void removePinned(File file) {
         this.pinnedFiles.remove(file);
     }
-    public ArrayList<File> getPinnedFiles() {
+    protected ArrayList<File> getPinnedFiles() {
         return this.pinnedFiles;
     }
-    public void savePinned() {
+    protected void savePinned() {
         try {
             PrintWriter pw = new PrintWriter(Loader.PATH_TO_CONFIG + "/pinned.txt");
             for (File f : this.pinnedFiles) {
@@ -58,7 +69,7 @@ public class MainLogic {
         }
     }
 
-    public void loadDrives() {
+    private void loadDrives() {
         this.disks.clear();
         for (Path root : FileSystems.getDefault().getRootDirectories()) {
             FileStore fileStore;
@@ -79,34 +90,72 @@ public class MainLogic {
             }
         }
     }
-    public ArrayList<DiskClass> getDisks() {
+    protected ArrayList<DiskClass> getDisks() {
         return this.disks;
     }
 
-    public boolean isListView() {
+    protected boolean isListView() {
         return listView;
     }
-    public void setListView(boolean listView) {
+    protected void setListView(boolean listView) {
         this.listView = listView;
     }
 
-    public boolean isOpenOnSame() {
+    protected boolean isOpenOnSame() {
         return openOnSame;
     }
-    public void setOpenOnSame(boolean openOnSame) {
+    protected void setOpenOnSame(boolean openOnSame) {
         this.openOnSame = openOnSame;
     }
 
-    public void addOpenedTab(Tab tab, File file) {
+    protected boolean isDoubleClick() {
+        return doubleClick;
+    }
+    protected void setDoubleClick(boolean doubleClick) {
+        this.doubleClick = doubleClick;
+    }
+
+    protected boolean isShowHidden() {
+        return showHidden;
+    }
+    protected void setShowHidden(boolean showHidden) {
+        this.showHidden = showHidden;
+    }
+
+    protected boolean isShowExtensions() {
+        return showExtensions;
+    }
+    protected void setShowExtensions(boolean showExtensions) {
+        this.showExtensions = showExtensions;
+    }
+
+    protected String getTheme() {
+        return theme;
+    }
+    protected void setTheme(String theme) {
+        this.theme = theme;
+    }
+    protected void changeTheme(String theme) {
+        this.mw.changeTheme(theme);
+    }
+
+    private Tab getSettingsTab() {
+        return settingsTab;
+    }
+    private void setSettingsTab(Tab settingsTab) {
+        this.settingsTab = settingsTab;
+    }
+
+    private void addOpenedTab(Tab tab, File file) {
         this.openedTabs.put(tab, file);
     }
-    public void removeOpenedTab(Tab tab) {
+    private void removeOpenedTab(Tab tab) {
         this.openedTabs.remove(tab);
     }
-    public File getFileFromTab(Tab tab) {
+    private File getFileFromTab(Tab tab) {
         return this.openedTabs.get(tab);
     }
-    public Tab addFolderTab(String name, String path) {
+    protected Tab addFolderTab(String name, String path) {
         File f = new File(path);
         Tab t = new Tab(name, this.mw.folderTab(f));
         this.addOpenedTab(t, f);
@@ -114,48 +163,10 @@ public class MainLogic {
         return t;
     }
 
-    public boolean isDoubleClick() {
-        return doubleClick;
-    }
-    public void setDoubleClick(boolean doubleClick) {
-        this.doubleClick = doubleClick;
-    }
-
-    public boolean isShowHidden() {
-        return showHidden;
-    }
-    public void setShowHidden(boolean showHidden) {
-        this.showHidden = showHidden;
-    }
-
-    public boolean isShowExtensions() {
-        return showExtensions;
-    }
-    public void setShowExtensions(boolean showExtensions) {
-        this.showExtensions = showExtensions;
-    }
-
-    public String getTheme() {
-        return theme;
-    }
-    public void setTheme(String theme) {
-        this.theme = theme;
-    }
-    public void changeTheme(String theme) {
-        this.mw.changeTheme(theme);
-    }
-
-    public Tab getSettingsTab() {
-        return settingsTab;
-    }
-    public void setSettingsTab(Tab settingsTab) {
-        this.settingsTab = settingsTab;
-    }
-
-    public void writeTheme(String theme) {
+    protected void writeTheme(String theme) {
         this.replaceValueInConfig(this.theme, theme);
     }
-    public void writeExtensions(boolean showExtensions) {
+    protected void writeExtensions(boolean showExtensions) {
         String s;
         if (this.showExtensions) {
             s = "yes";
@@ -170,7 +181,7 @@ public class MainLogic {
         }
         this.replaceValueInConfig(s, s1);
     }
-    public void writeHidden(boolean showHidden) {
+    protected void writeHidden(boolean showHidden) {
         String s;
         if (this.showHidden) {
             s = "true";
@@ -185,7 +196,7 @@ public class MainLogic {
         }
         this.replaceValueInConfig(s, s1);
     }
-    public void writeDoubleClick(boolean doubleClick) {
+    protected void writeDoubleClick(boolean doubleClick) {
         String s;
         if (this.doubleClick) {
             s = "1";
@@ -200,7 +211,7 @@ public class MainLogic {
         }
         this.replaceValueInConfig(s, s1);
     }
-    public void writeOnSame(boolean openOnSame) {
+    protected void writeOnSame(boolean openOnSame) {
         String s;
         if (this.openOnSame) {
             s = "same";
@@ -235,14 +246,14 @@ public class MainLogic {
         }
     }
 
-    public void copyPath(File file) {
+    protected void copyPath(File file) {
         if (file != null) {
             ClipboardContent content = new ClipboardContent();
             content.putString(file.getPath());
             this.clipboard.setContent(content);
         }
     }
-    public void copy(File file) {
+    protected void copy(File file) {
         if (file != null) {
             ClipboardContent content = new ClipboardContent();
             List<File> files = new ArrayList<>();
@@ -252,7 +263,7 @@ public class MainLogic {
             this.cutting = false;
         }
     }
-    public void cut(File file) {
+    protected void cut(File file) {
         if (file != null) {
             ClipboardContent content = new ClipboardContent();
             List<File> files = new ArrayList<>();
@@ -262,7 +273,7 @@ public class MainLogic {
             this.cutting = true;
         }
     }
-    public void paste(File file) {
+    protected void paste(File file) {
         if (this.clipboard.hasContent(DataFormat.FILES)) {
             File f = this.clipboard.getFiles().get(0);
             File f1 = new File(file.getPath() + "\\" + f.getName());
@@ -278,14 +289,14 @@ public class MainLogic {
                         }
                     }
                     this.cutting = false;
-                    this.mw.refresh(true);
+                    this.refresh(true);
                 } else {
                     if (f.isDirectory()) {
                         FileUtils.copyDirectory(f, f1);
                     } else {
                         FileUtils.copyFile(f, f1);
                     }
-                    this.mw.refresh(false);
+                    this.refresh(false);
                 }
             } catch (IOException e) {
                 new WarningWindow("Can't paste!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
@@ -293,10 +304,168 @@ public class MainLogic {
             }
         }
     }
+    protected void rename(File file) {
+        NameWindow nw = new NameWindow("Rename", file.getName(), this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
+        String newPath = file.getPath().replace(file.getName(), "").replace("\\\\", "\\") + nw.getName();
+        if (!file.renameTo(new File(newPath))) {
+            new WarningWindow("Can't rename file!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
+        }
+        this.refresh(false);
+    }
+    protected void openWith(File file) {
+        ProcessBuilder builder = new ProcessBuilder("RUNDLL32.EXE", "SHELL32.DLL,OpenAs_RunDLL", file.getAbsolutePath());
+        if (builder.redirectErrorStream()) {
+            new WarningWindow("Redirect error stream error!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
+        }
+        if (builder.redirectOutput() != ProcessBuilder.Redirect.PIPE) {
+            new WarningWindow("Redirect output error!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
+        }
+        Process process;
+        try {
+            process = builder.start();
+            process.waitFor();
+        } catch (IOException | InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    protected void delete(File file) {
+        if (file.isDirectory()) {
+            try {
+                FileUtils.deleteDirectory(file);
+            } catch (IOException ex) {
+                new WarningWindow("Can't delete directory!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
+                throw new RuntimeException(ex);
+            }
+        } else {
+            if (!file.delete()) {
+                new WarningWindow("Can't delete file!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
+            }
+        }
+        this.refresh(false);
+    }
 
-    public String back(String path) {
+    private String backPath(String path) {
         int index = path.lastIndexOf("\\");
         path = path.substring(0, index + 1);
         return path;
+    }
+    protected void back(Label address, Button back) {
+        if (!address.getText().equals("C:\\")) {
+            Tab t = this.mw.getTabPane().getSelectionModel().getSelectedItem();
+            t.setContent(null);
+            this.removeOpenedTab(t);
+            String backString = this.backPath(address.getText());
+            File f = new File(backString);
+            t.setContent(this.mw.folderTab(f));
+            t.setText(f.getName());
+            if (backString.equals("C:\\")) {
+                t.setText("(C:)OS");
+            }
+            this.addOpenedTab(t, f);
+        } else {
+            back.setDisable(false);
+        }
+    }
+    protected void settings() {
+        if (this.getSettingsTab() == null) {
+            Tab settingsTab = new Tab("Settings", this.mw.settingsTab());
+            settingsTab.setOnClosed(l -> this.setSettingsTab(null));
+            this.mw.getTabPane().getTabs().add(this.mw.getTabPane().getTabs().size() - 1, settingsTab);
+            this.mw.getTabPane().getSelectionModel().select(this.mw.getTabPane().getTabs().size() - 2);
+            this.setSettingsTab(settingsTab);
+        } else {
+            this.mw.getTabPane().getSelectionModel().select(this.getSettingsTab());
+        }
+    }
+    protected void newFolder(Label address) {
+        NameWindow nw = new NameWindow("Create new: ", "", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
+        boolean b = new File(address.getText() + "\\" + nw.getName()).mkdir();
+        if (!b) {
+            new WarningWindow("Can't create directory!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
+        }
+        this.refresh(false);
+    }
+
+    protected void openSide(String name, String path) {
+        this.mw.getTabPane().getTabs().add(this.mw.getTabPane().getTabs().size() - 1, this.addFolderTab(name, path));
+        this.mw.getTabPane().getSelectionModel().select(this.mw.getTabPane().getTabs().size() - 2);
+    }
+
+    protected void refresh(boolean all) {
+        if (all) {
+            for (Tab t : this.mw.getTabPane().getTabs()) {
+                t.setContent(null);
+                if (t.getText().equals("Home")) {
+                    this.loadDrives();
+                    t.setContent(this.mw.homeTab());
+                } else if (t.getText().equals("Settings")) {
+                    t.setContent(this.mw.settingsTab());
+                } else if (!t.getText().equals("Add")) {
+                    t.setContent(this.mw.folderTab(this.getFileFromTab(t)));
+                }
+            }
+        } else {
+            Tab t = this.mw.getTabPane().getSelectionModel().getSelectedItem();
+            t.setContent(null);
+            t.setContent(this.mw.folderTab(this.getFileFromTab(t)));
+        }
+    }
+
+    protected void setControlButtonActions(File file, HBox fileUI, Button control) {
+        control.setOnMouseEntered(e -> fileUI.setStyle("-fx-background-color: default-color"));
+        control.setOnMouseExited(e -> fileUI.setStyle("-fx-background-color: elevated-background-color"));
+
+        control.setOnAction(e -> {
+            if (!this.isDoubleClick()) {
+                clickOnFile(file);
+            } else {
+                fileUI.setStyle("-fx-background-color: selected-color");
+            }
+        });
+        control.setOnMouseClicked(e -> {
+            if(e.getButton().equals(MouseButton.PRIMARY)){
+                if(e.getClickCount() == 2){
+                    clickOnFile(file);
+                }
+            }
+        });
+    }
+    protected void setupControlButtonFile(Button control, HBox fileBox, File file) {
+        if (file.isDirectory()) {
+            control.setContextMenu(this.mw.setRightClickMenu(0, file));
+        } else {
+            control.setContextMenu(this.mw.setRightClickMenu(3, file));
+        }
+        setControlButtonActions(file, fileBox, control);
+    }
+    private void clickOnFile(File file) {
+        if (file.isDirectory()) {
+            int index = this.mw.getTabPane().getTabs().size() - 1;
+            if (this.isOpenOnSame()) {
+                index = this.mw.getTabPane().getSelectionModel().getSelectedIndex();
+                Tab t = this.mw.getTabPane().getTabs().get(index);
+                this.removeOpenedTab(t);
+                this.mw.getTabPane().getTabs().remove(t);
+            }
+            this.mw.getTabPane().getTabs().add(index, this.addFolderTab(file.getName(), file.getPath()));
+            this.mw.getTabPane().getSelectionModel().select(index);
+        } else {
+            try {
+                Desktop.getDesktop().open(file);
+            } catch (IOException ex) {
+                new WarningWindow("Can't open file!", this.mw.getMainScene().getStylesheets().get(this.mw.getMainScene().getStylesheets().size() - 1));
+                throw new RuntimeException(ex);
+            }
+            this.refresh(false);
+        }
+    }
+    protected ImageView iconToImageView(File file) {
+        ImageView icon;
+        Icon i = FileSystemView.getFileSystemView().getSystemIcon(file);
+        BufferedImage bi = new BufferedImage(i.getIconWidth(), i.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+        i.paintIcon(null, bi.getGraphics(), 0, 0);
+        Image im = SwingFXUtils.toFXImage(bi, null);
+        icon = new ImageView(im);
+        return icon;
     }
 }

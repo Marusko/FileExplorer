@@ -1,5 +1,4 @@
 import javafx.application.Application;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,15 +9,11 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
 
-import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
-import java.awt.Desktop;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -70,14 +65,17 @@ public class MainWindow extends Application {
         this.tabPage();
         bp.setCenter(this.tabPane);
         new Loader(this.ml);
-        this.refresh(true);
+        this.ml.refresh(true);
         stage.show();
     }
-    public Scene getMainScene() {
+    protected Scene getMainScene() {
         return mainScene;
     }
+    protected TabPane getTabPane() {
+        return this.tabPane;
+    }
 
-    public void changeTheme(String theme) {
+    protected void changeTheme(String theme) {
         switch (theme) {
             case "Dark" -> {
                 this.ml.writeTheme("Dark");
@@ -93,25 +91,6 @@ public class MainWindow extends Application {
             }
         }
     }
-    public void refresh(boolean all) {
-        if (all) {
-            for (Tab t : tabPane.getTabs()) {
-                t.setContent(null);
-                if (t.getText().equals("Home")) {
-                    this.ml.loadDrives();
-                    t.setContent(this.homeTab());
-                } else if (t.getText().equals("Settings")) {
-                    t.setContent(this.settingsTab());
-                } else if (!t.getText().equals("Add")) {
-                    t.setContent(this.folderTab(this.ml.getFileFromTab(t)));
-                }
-            }
-        } else {
-            Tab t = tabPane.getSelectionModel().getSelectedItem();
-            t.setContent(null);
-            t.setContent(this.folderTab(this.ml.getFileFromTab(t)));
-        }
-    }
 
     //UI--------------------------------------
     private VBox sidePage() {
@@ -121,44 +100,28 @@ public class MainWindow extends Application {
         desktop.getStyleClass().add("side-button");
         desktop.setOnAction(e -> {
             FileSystemView fsv = FileSystemView.getFileSystemView();
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Desktop", fsv.getHomeDirectory().getPath()));
-            this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
+            this.ml.openSide("Desktop", fsv.getHomeDirectory().getPath());
         });
 
         Button download = new Button("Download");
         download.getStyleClass().add("side-button");
-        download.setOnAction(e -> {
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Downloads", FileUtils.getUserDirectoryPath() + "/Downloads/"));
-            this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
-        });
+        download.setOnAction(e -> this.ml.openSide("Downloads", FileUtils.getUserDirectoryPath() + "/Downloads/"));
 
         Button docs = new Button("Documents");
         docs.getStyleClass().add("side-button");
-        docs.setOnAction(e -> {
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Documents", FileUtils.getUserDirectoryPath() + "/Documents/"));
-            this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
-        });
+        docs.setOnAction(e -> this.ml.openSide("Documents", FileUtils.getUserDirectoryPath() + "/Documents/"));
 
         Button pics = new Button("Pictures");
         pics.getStyleClass().add("side-button");
-        pics.setOnAction(e -> {
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Pictures", FileUtils.getUserDirectoryPath() + "/Pictures/"));
-            this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
-        });
+        pics.setOnAction(e -> this.ml.openSide("Pictures", FileUtils.getUserDirectoryPath() + "/Pictures/"));
 
         Button music = new Button("Music");
         music.getStyleClass().add("side-button");
-        music.setOnAction(e -> {
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Music", FileUtils.getUserDirectoryPath() + "/Music/"));
-            this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
-        });
+        music.setOnAction(e -> this.ml.openSide("Music", FileUtils.getUserDirectoryPath() + "/Music/"));
 
         Button videos = new Button("Videos");
         videos.getStyleClass().add("side-button");
-        videos.setOnAction(e -> {
-            this.tabPane.getTabs().add(this.tabPane.getTabs().size() - 1, this.ml.addFolderTab("Videos", FileUtils.getUserDirectoryPath() + "/Videos/"));
-            this.tabPane.getSelectionModel().select(this.tabPane.getTabs().size() - 2);
-        });
+        videos.setOnAction(e -> this.ml.openSide("Videos", FileUtils.getUserDirectoryPath() + "/Videos/"));
 
         side.getChildren().addAll(desktop, download, docs, pics, music, videos);
         side.setMaxWidth(200);
@@ -171,7 +134,6 @@ public class MainWindow extends Application {
     private void tabPage() {
         Tab addTab = new Tab("Add");
         addTab.setClosable(false);
-
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if(newTab == addTab) {
                 tabPane.getTabs().add(tabPane.getTabs().size() - 1, new Tab("Home", this.homeTab()));
@@ -181,7 +143,7 @@ public class MainWindow extends Application {
         tabPane.getTabs().addAll(new Tab("Home", this.homeTab()), addTab);
     }
 
-    private BorderPane homeTab() {
+    protected BorderPane homeTab() {
         BorderPane homeBP = new BorderPane();
         Accordion homeAccordion = new Accordion();
 
@@ -223,7 +185,7 @@ public class MainWindow extends Application {
 
         return homeBP;
     }
-    public BorderPane folderTab(File file) {
+    protected BorderPane folderTab(File file) {
         BorderPane folderBP = new BorderPane();
         folderBP.getStyleClass().add("home-border-pane");
         ScrollPane folderSP = new ScrollPane();
@@ -273,7 +235,7 @@ public class MainWindow extends Application {
         folderBP.setCenter(folderSP);
         return folderBP;
     }
-    private VBox settingsTab() {
+    protected VBox settingsTab() {
         Label themeLabel = new Label("Theme: ");
         themeLabel.getStyleClass().add("settings-label");
         ComboBox<String> themeChooser = new ComboBox<>();
@@ -351,13 +313,13 @@ public class MainWindow extends Application {
                 yes.selectedProperty().addListener(e -> {
                     this.ml.writeExtensions(true);
                     this.ml.setShowExtensions(true);
-                    refresh(true);
+                    this.ml.refresh(true);
                 });
                 no.setSelected(!this.ml.isShowExtensions());
                 no.selectedProperty().addListener(e -> {
                     this.ml.writeExtensions(false);
                     this.ml.setShowExtensions(false);
-                    refresh(true);
+                    this.ml.refresh(true);
                 });
             }
             case 1 -> {
@@ -365,13 +327,13 @@ public class MainWindow extends Application {
                 yes.selectedProperty().addListener(e -> {
                     this.ml.writeHidden(true);
                     this.ml.setShowHidden(true);
-                    refresh(true);
+                    this.ml.refresh(true);
                 });
                 no.setSelected(!this.ml.isShowHidden());
                 no.selectedProperty().addListener(e -> {
                     this.ml.writeHidden(false);
                     this.ml.setShowHidden(false);
-                    refresh(true);
+                    this.ml.refresh(true);
                 });
             }
             case 2 -> {
@@ -406,7 +368,7 @@ public class MainWindow extends Application {
         listView.getStyleClass().add("bottom-bar-button");
         listView.setOnAction(e -> {
             this.ml.setListView(true);
-            this.refresh(false);
+            this.ml.refresh(false);
         });
         ImageView iconL = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/form.png")).toExternalForm()));
         iconL.setFitWidth(20);
@@ -417,7 +379,7 @@ public class MainWindow extends Application {
         objectView.getStyleClass().add("bottom-bar-button");
         objectView.setOnAction(e -> {
             this.ml.setListView(false);
-            this.refresh(false);
+            this.ml.refresh(false);
         });
         ImageView iconO = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/blog.png")).toExternalForm()));
         iconO.setFitWidth(20);
@@ -447,7 +409,7 @@ public class MainWindow extends Application {
         iconR.setFitWidth(20);
         iconR.setFitHeight(20);
         refresh.setGraphic(iconR);
-        refresh.setOnAction(e -> this.refresh(true));
+        refresh.setOnAction(e -> this.ml.refresh(true));
 
         MenuButton more = new MenuButton();
         more.getStyleClass().add("top-bar-button");
@@ -463,17 +425,7 @@ public class MainWindow extends Application {
         MenuItem delete = new MenuItem("Delete");
         delete.setDisable(true);
         MenuItem settings = new MenuItem("Settings");
-        settings.setOnAction(e -> {
-            if (this.ml.getSettingsTab() == null) {
-                Tab settingsTab = new Tab("Settings", this.settingsTab());
-                settingsTab.setOnClosed(l -> this.ml.setSettingsTab(null));
-                tabPane.getTabs().add(tabPane.getTabs().size() - 1, settingsTab);
-                tabPane.getSelectionModel().select(tabPane.getTabs().size() - 2);
-                this.ml.setSettingsTab(settingsTab);
-            } else {
-                tabPane.getSelectionModel().select(this.ml.getSettingsTab());
-            }
-        });
+        settings.setOnAction(e -> this.ml.settings());
         MenuItem rename = new MenuItem("Rename");
         rename.setDisable(true);
         MenuItem newMenuItem = new MenuItem("New folder");
@@ -494,44 +446,20 @@ public class MainWindow extends Application {
         topBar.setPadding(new Insets(2));
         topBar.getStyleClass().add("hbox-bar");
 
-        back.setOnAction(e -> {
-            if (!address.getText().equals("C:\\")) {
-                Tab t = this.tabPane.getSelectionModel().getSelectedItem();
-                t.setContent(null);
-                this.ml.removeOpenedTab(t);
-                String backString = this.ml.back(address.getText());
-                File f = new File(backString);
-                t.setContent(this.folderTab(f));
-                t.setText(f.getName());
-                if (backString.equals("C:\\")) {
-                    t.setText("(C:)OS");
-                }
-                this.ml.addOpenedTab(t, f);
-            } else {
-                back.setDisable(false);
-            }
-        });
-
+        back.setOnAction(e -> this.ml.back(address, back));
         paste.setOnAction(e -> this.ml.paste(new File(address.getText())));
-        newMenuItem.setOnAction(e -> {
-            NameWindow nw = new NameWindow("Create new: ", "", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
-            boolean b = new File(address.getText() + "\\" + nw.getName()).mkdir();
-            if (!b) {
-                new WarningWindow("Can't create directory!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
-            }
-            this.refresh(false);
-        });
+        newMenuItem.setOnAction(e -> this.ml.newFolder(address));
 
         return topBar;
     }
-    private ContextMenu setRightClickMenu(int onFile, File file) {
+    protected ContextMenu setRightClickMenu(int onFile, File file) {
         ContextMenu menu = new ContextMenu();
         switch (onFile) {
             case 0 -> {
                 MenuItem pin = new MenuItem("Pin this");
                 pin.setOnAction(e -> {
                     this.ml.addPinned(file);
-                    this.refresh(true);
+                    this.ml.refresh(true);
                 });
 
                 MenuItem pathItem = new MenuItem("Copy path");
@@ -544,28 +472,14 @@ public class MainWindow extends Application {
                 copy.setOnAction(e -> this.ml.copy(file));
 
                 MenuItem delete = new MenuItem("Delete");
-                delete.setOnAction(e -> {
-                    try {
-                        FileUtils.deleteDirectory(file);
-                    } catch (IOException ex) {
-                        new WarningWindow("Can't delete directory!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
-                        throw new RuntimeException(ex);
-                    }
-                    this.refresh(false);
-                });
+                delete.setOnAction(e -> this.ml.delete(file));
 
                 MenuItem select = new MenuItem("Select");
                 select.setDisable(true);
 
                 MenuItem rename = new MenuItem("Rename");
-                rename.setOnAction(e -> {
-                    NameWindow nw = new NameWindow("Rename", file.getName(), mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
-                    String newPath = file.getPath().replace(file.getName(), "").replace("\\\\", "\\") + nw.getName();
-                    if (!file.renameTo(new File(newPath))) {
-                        new WarningWindow("Can't rename directory!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
-                    }
-                    this.refresh(false);
-                });
+                rename.setOnAction(e -> this.ml.rename(file));
+
                 MenuItem properties = new MenuItem("Properties");
                 properties.setOnAction(e -> new PropertiesWindow(file, mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1)));
 
@@ -575,7 +489,7 @@ public class MainWindow extends Application {
                 MenuItem unpin = new MenuItem("Unpin this");
                 unpin.setOnAction(e -> {
                     this.ml.removePinned(file);
-                    this.refresh(true);
+                    this.ml.refresh(true);
                 });
 
                 MenuItem pathItem1 = new MenuItem("Copy path");
@@ -605,43 +519,16 @@ public class MainWindow extends Application {
                 copy.setOnAction(e -> this.ml.copy(file));
 
                 MenuItem delete = new MenuItem("Delete");
-                delete.setOnAction(e -> {
-                    if (!file.delete()) {
-                        new WarningWindow("Can't delete file!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
-                    }
-                    this.refresh(false);
-                });
+                delete.setOnAction(e -> this.ml.delete(file));
 
                 MenuItem select = new MenuItem("Select");
                 select.setDisable(true);
 
                 MenuItem openWith = new MenuItem("Open with");
-                openWith.setOnAction(e -> {
-                    ProcessBuilder builder = new ProcessBuilder("RUNDLL32.EXE", "SHELL32.DLL,OpenAs_RunDLL", file.getAbsolutePath());
-                    if (builder.redirectErrorStream()) {
-                        new WarningWindow("Redirect error stream error!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
-                    }
-                    if (builder.redirectOutput() != ProcessBuilder.Redirect.PIPE) {
-                        new WarningWindow("Redirect output error!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
-                    }
-                    Process process;
-                    try {
-                        process = builder.start();
-                        process.waitFor();
-                    } catch (IOException | InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                });
+                openWith.setOnAction(e -> this.ml.openWith(file));
 
                 MenuItem rename = new MenuItem("Rename");
-                rename.setOnAction(e -> {
-                    NameWindow nw = new NameWindow("Rename", file.getName(), mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
-                    String newPath = file.getPath().replace(file.getName(), "").replace("\\\\", "\\") + nw.getName();
-                    if (!file.renameTo(new File(newPath))) {
-                    new WarningWindow("Can't rename file!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
-                }
-                this.refresh(false);
-                });
+                rename.setOnAction(e -> this.ml.rename(file));
 
                 MenuItem properties = new MenuItem("Properties");
                 properties.setOnAction(e -> new PropertiesWindow(file, mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1)));
@@ -705,7 +592,7 @@ public class MainWindow extends Application {
         Button control = new Button();
         control.getStyleClass().add("pinned-control-right");
         control.setContextMenu(this.setRightClickMenu(1, file));
-        setControlButtonActions(file, fileUI, control);
+        this.ml.setControlButtonActions(file, fileUI, control);
 
         StackPane fileSP = new StackPane(fileUI, control);
 
@@ -734,7 +621,7 @@ public class MainWindow extends Application {
             if (file.isDirectory()) {
                 icon = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/folder_small.png")).toExternalForm()));
             } else {
-                icon = iconToImageView(file);
+                icon = this.ml.iconToImageView(file);
             }
 
             if (!this.ml.isShowExtensions() && !file.isDirectory()) {
@@ -756,7 +643,7 @@ public class MainWindow extends Application {
 
             Button control = new Button();
             control.setStyle("-fx-pref-height: 40px; -fx-pref-width: 900px; -fx-background-color: transparent");
-            this.setupControlButtonFile(control, fileBox, file);
+            this.ml.setupControlButtonFile(control, fileBox, file);
 
             StackPane listSP = new StackPane(listBox, control);
             fileBox.getChildren().add(listSP);
@@ -766,7 +653,7 @@ public class MainWindow extends Application {
             if (file.isDirectory()) {
                 icon = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("icons/normal/folder.png")).toExternalForm()));
             } else {
-                icon = iconToImageView(file);
+                icon = this.ml.iconToImageView(file);
             }
             Label fileName = new Label(name);
             objectBox.getChildren().addAll(icon, fileName);
@@ -774,69 +661,10 @@ public class MainWindow extends Application {
 
             Button control = new Button();
             control.setStyle("-fx-pref-height: 210px; -fx-pref-width: 170px; -fx-background-color: transparent");
-            this.setupControlButtonFile(control, fileBox, file);
+            this.ml.setupControlButtonFile(control, fileBox, file);
             StackPane objectSP = new StackPane(objectBox, control);
             fileBox.getChildren().add(objectSP);
         }
         return fileBox;
     }
-
-    private void setControlButtonActions(File file, HBox fileUI, Button control) {
-        control.setOnMouseEntered(e -> fileUI.setStyle("-fx-background-color: default-color"));
-        control.setOnMouseExited(e -> fileUI.setStyle("-fx-background-color: elevated-background-color"));
-
-        control.setOnAction(e -> {
-            if (!this.ml.isDoubleClick()) {
-                clickOnFile(file);
-            } else {
-                fileUI.setStyle("-fx-background-color: selected-color");
-            }
-        });
-        control.setOnMouseClicked(e -> {
-            if(e.getButton().equals(MouseButton.PRIMARY)){
-                if(e.getClickCount() == 2){
-                    clickOnFile(file);
-                }
-            }
-        });
-    }
-    private void setupControlButtonFile(Button control, HBox fileBox, File file) {
-        if (file.isDirectory()) {
-            control.setContextMenu(this.setRightClickMenu(0, file));
-        } else {
-            control.setContextMenu(this.setRightClickMenu(3, file));
-        }
-        setControlButtonActions(file, fileBox, control);
-    }
-    private void clickOnFile(File file) {
-        if (file.isDirectory()) {
-            int index = this.tabPane.getTabs().size() - 1;
-            if (this.ml.isOpenOnSame()) {
-                index = this.tabPane.getSelectionModel().getSelectedIndex();
-                Tab t = this.tabPane.getTabs().get(index);
-                this.ml.removeOpenedTab(t);
-                this.tabPane.getTabs().remove(t);
-            }
-            this.tabPane.getTabs().add(index, this.ml.addFolderTab(file.getName(), file.getPath()));
-            this.tabPane.getSelectionModel().select(index);
-        } else {
-            try {
-                Desktop.getDesktop().open(file);
-            } catch (IOException ex) {
-                new WarningWindow("Can't open file!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
-                throw new RuntimeException(ex);
-            }
-            this.refresh(false);
-        }
-    }
-    private ImageView iconToImageView(File file) {
-        ImageView icon;
-        Icon i = FileSystemView.getFileSystemView().getSystemIcon(file);
-        BufferedImage bi = new BufferedImage(i.getIconWidth(), i.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-        i.paintIcon(null, bi.getGraphics(), 0, 0);
-        Image im = SwingFXUtils.toFXImage(bi, null);
-        icon = new ImageView(im);
-        return icon;
-    }
-
 }

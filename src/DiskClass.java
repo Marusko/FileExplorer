@@ -13,22 +13,22 @@ public class DiskClass {
         this.path = path;
     }
 
-    public String getName() {
+    protected String getName() {
         return name;
     }
-    public double getUsedPercentage() {
+    protected double getUsedPercentage() {
         return Math.round((1 - ((double) this.freeCapacity / (double) this.totalCapacity)) * 100.0) / 100.0;
     }
-    public long getTotalCapacity() {
+    protected long getTotalCapacity() {
         return totalCapacity / 1000000000;
     }
-    public long getFreeCapacity() {
+    protected long getFreeCapacity() {
         return freeCapacity / 1000000000;
     }
-    public String  isRemovable() {
+    protected String  isRemovable() {
         return removable;
     }
-    public String getPath() {
+    protected String getPath() {
         return path;
     }
 }

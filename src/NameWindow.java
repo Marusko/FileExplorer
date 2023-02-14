@@ -53,7 +53,7 @@ public class NameWindow {
     private void setName(String name) {
         this.name = name;
     }
-    public String getName() {
+    protected String getName() {
         return this.name;
     }
 }
