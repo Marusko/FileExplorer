@@ -559,8 +559,10 @@ public class MainWindow extends Application {
                     }
                     this.refresh(false);
                 });
+                MenuItem properties = new MenuItem("Properties");
+                properties.setOnAction(e -> new PropertiesWindow(file, mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1)));
 
-                menu.getItems().addAll(select, copy, cut, delete, pin, pathItem, rename);
+                menu.getItems().addAll(select, copy, cut, delete, pin, pathItem, rename, properties);
             }
             case 1 -> {
                 MenuItem unpin = new MenuItem("Unpin this");
@@ -575,7 +577,10 @@ public class MainWindow extends Application {
                 MenuItem copy1 = new MenuItem("Copy");
                 copy1.setOnAction(e -> this.ml.copy(file));
 
-                menu.getItems().addAll(copy1, unpin, pathItem1);
+                MenuItem properties = new MenuItem("Properties");
+                properties.setOnAction(e -> new PropertiesWindow(file, mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1)));
+
+                menu.getItems().addAll(copy1, unpin, pathItem1, properties);
             }
             case 2 -> {
                 MenuItem paste = new MenuItem("Paste");
@@ -629,9 +634,12 @@ public class MainWindow extends Application {
                     new WarningWindow("Can't rename file!", mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1));
                 }
                 this.refresh(false);
-            });
+                });
 
-                menu.getItems().addAll(select, copy, cut, delete, pathItem, rename, openWith);
+                MenuItem properties = new MenuItem("Properties");
+                properties.setOnAction(e -> new PropertiesWindow(file, mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1)));
+
+                menu.getItems().addAll(select, copy, cut, delete, pathItem, rename, openWith, properties);
             }
         }
         return menu;
