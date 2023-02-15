@@ -4,6 +4,7 @@ import java.io.*;
 public class Loader {
     private static final String FALL_BACK = "[Theme]=Dark;[Extensions]=no;[Hidden]=false;[Double]=1;[Where]=same";
     public static final String PATH_TO_CONFIG = FileSystemView.getFileSystemView().getHomeDirectory().toString() + "/FileExplorer";
+    //public static final String PATH_TO_CONFIG = "C:\\Program Files\\Matus_Susky\\FileExplorer";
 
     private final MainLogic ml;
 
