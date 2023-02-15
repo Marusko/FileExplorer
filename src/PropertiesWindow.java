@@ -134,10 +134,14 @@ public class PropertiesWindow {
         }
         s += i;
         switch (count) {
-            case 0 -> s += "B";
-            case 1 -> s += "kB";
-            case 2 -> s += "MB";
-            case 3 -> s += "GB";
+            case 0: s += "B";
+                    break;
+            case 1: s += "kB";
+                    break;
+            case 2: s += "MB";
+                    break;
+            case 3: s += "GB";
+                    break;
         }
         s = s + "  (" + size + " B)";
         return s;

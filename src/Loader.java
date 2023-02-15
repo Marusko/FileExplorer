@@ -95,32 +95,30 @@ public class Loader {
 
     private void configSettings(String[] s) {
         switch (s[0]) {
-            case "Theme" -> {
-                this.ml.setTheme(s[1]);
-                this.ml.changeTheme(s[1]);
-            }
-            case "Extensions" -> {
-                if (s[1].equals("no")) {
-                    this.ml.setShowExtensions(false);
-                } else if (s[1].equals("yes")){
-                    this.ml.setShowExtensions(true);
-                }
-            }
-            case "Hidden" -> this.ml.setShowHidden(Boolean.parseBoolean(s[1]));
-            case "Double" -> {
-                if (s[1].equals("0")) {
-                    this.ml.setDoubleClick(false);
-                } else if (s[1].equals("1")){
-                    this.ml.setDoubleClick(true);
-                }
-            }
-            case "Where" -> {
-                if (s[1].equals("new")) {
-                    this.ml.setOpenOnSame(false);
-                } else if (s[1].equals("same")){
-                    this.ml.setOpenOnSame(true);
-                }
-            }
+            case "Theme":   this.ml.setTheme(s[1]);
+                            this.ml.changeTheme(s[1]);
+                            break;
+            case "Extensions":  if (s[1].equals("no")) {
+                                    this.ml.setShowExtensions(false);
+                                } else if (s[1].equals("yes")){
+                                    this.ml.setShowExtensions(true);
+                                }
+                                break;
+
+            case "Hidden": this.ml.setShowHidden(Boolean.parseBoolean(s[1]));
+                            break;
+            case "Double":  if (s[1].equals("0")) {
+                                this.ml.setDoubleClick(false);
+                            } else if (s[1].equals("1")){
+                                this.ml.setDoubleClick(true);
+                            }
+                            break;
+            case "Where":   if (s[1].equals("new")) {
+                                this.ml.setOpenOnSame(false);
+                            } else if (s[1].equals("same")){
+                                this.ml.setOpenOnSame(true);
+                            }
+                            break;
         }
     }
     private String[][] splitString(String s) {

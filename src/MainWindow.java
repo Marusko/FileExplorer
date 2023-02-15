@@ -77,18 +77,18 @@ public class MainWindow extends Application {
 
     protected void changeTheme(String theme) {
         switch (theme) {
-            case "Dark" -> {
+            case "Dark":
                 this.ml.writeTheme("Dark");
                 this.ml.setTheme("Dark");
                 mainScene.getStylesheets().clear();
                 mainScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles/darkTheme.css")).toExternalForm());
-            }
-            case "Light" -> {
+                break;
+            case "Light":
                 this.ml.writeTheme("Light");
                 this.ml.setTheme("Light");
                 mainScene.getStylesheets().clear();
                 mainScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles/lightTheme.css")).toExternalForm());
-            }
+                break;
         }
     }
 
@@ -308,7 +308,7 @@ public class MainWindow extends Application {
         RadioButton yes = new RadioButton("Yes");
         RadioButton no = new RadioButton("No");
         switch (submenu) {
-            case 0 -> {
+            case 0:
                 yes.setSelected(this.ml.isShowExtensions());
                 yes.selectedProperty().addListener(e -> {
                     this.ml.writeExtensions(true);
@@ -321,8 +321,8 @@ public class MainWindow extends Application {
                     this.ml.setShowExtensions(false);
                     this.ml.refresh(true);
                 });
-            }
-            case 1 -> {
+             break;
+            case 1:
                 yes.setSelected(this.ml.isShowHidden());
                 yes.selectedProperty().addListener(e -> {
                     this.ml.writeHidden(true);
@@ -335,8 +335,8 @@ public class MainWindow extends Application {
                     this.ml.setShowHidden(false);
                     this.ml.refresh(true);
                 });
-            }
-            case 2 -> {
+             break;
+            case 2:
                 yes.setSelected(this.ml.isDoubleClick());
                 yes.selectedProperty().addListener(e -> {
                     this.ml.writeDoubleClick(true);
@@ -347,7 +347,7 @@ public class MainWindow extends Application {
                     this.ml.writeDoubleClick(false);
                     this.ml.setDoubleClick(false);
                 });
-            }
+             break;
         }
 
         ToggleGroup toggleGroup = new ToggleGroup();
@@ -463,15 +463,15 @@ public class MainWindow extends Application {
     protected ContextMenu setRightClickMenu(int onFile, File file, HBox ui) {
         ContextMenu menu = new ContextMenu();
         switch (onFile) {
-            case 0 -> {
+            case 0:
                 MenuItem pin = new MenuItem("Pin this");
                 pin.setOnAction(e -> {
                     this.ml.addPinned(file);
                     this.ml.refresh(true);
                 });
                 this.setRightClickItems(menu, file, ui, pin);
-            }
-            case 1 -> {
+             break;
+            case 1:
                 MenuItem unpin = new MenuItem("Unpin this");
                 unpin.setOnAction(e -> {
                     this.ml.removePinned(file);
@@ -488,17 +488,17 @@ public class MainWindow extends Application {
                 properties.setOnAction(e -> new PropertiesWindow(file, mainScene.getStylesheets().get(mainScene.getStylesheets().size() - 1)));
 
                 menu.getItems().addAll(copy, unpin, pathItem, properties);
-            }
-            case 2 -> {
+             break;
+            case 2:
                 MenuItem paste = new MenuItem("Paste");
                 paste.setOnAction(e -> this.ml.paste(file));
                 menu.getItems().add(paste);
-            }
-            case 3 -> {
+             break;
+            case 3:
                 MenuItem openWith = new MenuItem("Open with");
                 openWith.setOnAction(e -> this.ml.openWith(file));
                 this.setRightClickItems(menu, file, ui, openWith);
-            }
+              break;
         }
         return menu;
     }
